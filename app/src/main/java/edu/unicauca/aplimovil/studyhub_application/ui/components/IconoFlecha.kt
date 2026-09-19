@@ -3,11 +3,11 @@ package edu.unicauca.aplimovil.studyhub_application.ui.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
 
 /**
  * Dirección hacia la que apunta la flecha triangular.
@@ -27,6 +27,8 @@ fun IconoFlecha(
     direccion: DireccionFlecha,
     modifier: Modifier = Modifier
 ) {
+    val colorFlecha = MaterialTheme.colorScheme.onBackground
+
     Canvas(
         modifier = modifier
             .size(12.dp)
@@ -48,6 +50,6 @@ fun IconoFlecha(
             close()
         }
 
-        drawPath(path = trianguloPath, color = TextoPrincipal)
+        drawPath(path = trianguloPath, color = colorFlecha)
     }
 }

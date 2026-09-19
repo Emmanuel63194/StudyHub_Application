@@ -13,19 +13,17 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
 import edu.unicauca.aplimovil.studyhub_application.ui.components.TarjetaResumen
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 /**
  * Pantalla principal (Resumen) de StudyHub.
@@ -39,7 +37,7 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(FondoPrincipal)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -54,9 +52,8 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = "Resumen",
-                color = TextoPrincipal,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold
+                color = MaterialTheme.colorScheme.onBackground,
+                style = TipografiaStudyHub.TituloSeccion
             )
         }
 
@@ -65,9 +62,8 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
         // Sección "Hoy"
         Text(
             text = "Hoy",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion
         )
         Spacer(modifier = Modifier.height(12.dp))
         TarjetaResumen()
@@ -77,19 +73,18 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
         // Sección "Mañana"
         Text(
             text = "Mañana",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion
         )
         Spacer(modifier = Modifier.height(12.dp))
         TarjetaResumen()
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF191919)
+@Preview(showBackground = true, backgroundColor = 0xFF111318)
 @Composable
 fun PantallaInicioPreview() {
-    StudyHub_ApplicationTheme {
+    AppTheme(darkTheme = true, dynamicColor = false) {
         PantallaInicio()
     }
 }

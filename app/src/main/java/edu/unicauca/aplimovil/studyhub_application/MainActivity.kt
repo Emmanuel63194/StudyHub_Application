@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -24,8 +25,7 @@ import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCalendario
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCalificaciones
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCuestionarios
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaInicio
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            StudyHub_ApplicationTheme {
+            AppTheme(darkTheme = true, dynamicColor = false) {
                 ContenidoPrincipalApp()
             }
         }
@@ -66,7 +66,7 @@ private fun ContenidoPrincipalApp() {
         drawerContent = {
             ModalDrawerSheet(
                 modifier = Modifier.width(310.dp),
-                drawerContainerColor = FondoPrincipal
+                drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
                 PanelNavegacionLateral(
                     pantallaActual = pantallaActual,

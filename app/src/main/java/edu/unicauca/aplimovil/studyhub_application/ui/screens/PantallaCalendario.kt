@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,13 +35,8 @@ import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.ui.components.DireccionFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.AcentoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.IconoOscuro
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.SuperficieTarjeta
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoSecundario
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 // Nombres de los días de la semana (encabezado del calendario).
 private val DiasSemana = listOf("D", "L", "Ma", "Mi", "J", "V", "S")
@@ -70,7 +66,7 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(FondoPrincipal)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
 
@@ -121,9 +117,8 @@ private fun BarraSuperiorCalendario(onMenuClick: () -> Unit) {
 
         Text(
             text = "Calendario",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion,
             modifier = Modifier.weight(1f)
         )
 
@@ -146,12 +141,12 @@ private fun BotonAgregar() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AcentoPrincipal, shape = RoundedCornerShape(50)),
+                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(50)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Agregar",
-                color = IconoOscuro,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -169,7 +164,7 @@ private fun ContenedorCalendario() {
         modifier = Modifier
             .fillMaxWidth()
 
-            .background(SuperficieTarjeta)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(vertical = 16.dp, horizontal = 12.dp)
     ) {
         NavegacionMes()
@@ -201,9 +196,8 @@ private fun NavegacionMes() {
 
         Text(
             text = "Agosto 2026",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion
         )
 
         IconoFlecha(direccion = DireccionFlecha.DERECHA)
@@ -219,7 +213,7 @@ private fun EncabezadoDiasSemana() {
         DiasSemana.forEach { dia ->
             Text(
                 text = dia,
-                color = TextoSecundario,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
@@ -263,12 +257,16 @@ private fun CeldaDia(dia: Int) {
         modifier = Modifier
             .size(30.dp)
             .clip(CircleShape)
-            .background(if (estaSeleccionado) AcentoPrincipal else androidx.compose.ui.graphics.Color.Transparent),
+            .background(
+                if (estaSeleccionado) MaterialTheme.colorScheme.primary
+                else androidx.compose.ui.graphics.Color.Transparent
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = dia.toString(),
-            color = if (estaSeleccionado) IconoOscuro else TextoPrincipal,
+            color = if (estaSeleccionado) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onBackground,
             fontSize = 20.sp
         )
     }
@@ -296,17 +294,17 @@ private fun EstadoVacioEventos() {
 
         Text(
             text = "Sin eventos",
-            color = TextoSecundario,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 24.sp,
             textAlign = TextAlign.Center
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF191919)
+@Preview(showBackground = true, backgroundColor = 0xFF111318)
 @Composable
 fun PantallaCalendarioPreview() {
-    StudyHub_ApplicationTheme {
+    AppTheme(darkTheme = true, dynamicColor = false) {
         PantallaCalendario()
     }
 }

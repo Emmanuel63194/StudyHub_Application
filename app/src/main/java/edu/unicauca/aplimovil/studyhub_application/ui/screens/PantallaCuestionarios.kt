@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,12 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.AcentoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.IconoOscuro
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoSecundario
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 /**
  * Pantalla de Cuestionarios de StudyHub.
@@ -54,7 +51,7 @@ fun PantallaCuestionarios(onMenuClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FondoPrincipal)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -101,9 +98,8 @@ private fun BarraSuperiorCuestionarios(onMenuClick: () -> Unit) {
 
         Text(
             text = "Cuestionarios",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion
         )
     }
 }
@@ -127,9 +123,8 @@ private fun EstadoVacioCuestionarios() {
 
     Text(
         text = "Sin cuestionarios",
-        color = TextoPrincipal,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = TipografiaStudyHub.TituloSeccion,
         textAlign = TextAlign.Center
     )
 
@@ -137,7 +132,7 @@ private fun EstadoVacioCuestionarios() {
 
     Text(
         text = "Los cuestionarios que añadas aparecerán aquí",
-        color = TextoSecundario,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 16.sp,
         textAlign = TextAlign.Center
     )
@@ -153,22 +148,22 @@ private fun BotonAgregarCuestionario(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(56.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(AcentoPrincipal),
+            .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "+",
-            color = IconoOscuro,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 30.sp,
             fontWeight = FontWeight.Normal
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF191919)
+@Preview(showBackground = true, backgroundColor = 0xFF111318)
 @Composable
 fun PantallaCuestionariosPreview() {
-    StudyHub_ApplicationTheme {
+    AppTheme(darkTheme = true, dynamicColor = false) {
         PantallaCuestionarios()
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,13 +35,8 @@ import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.ui.components.DireccionFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.AcentoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.IconoOscuro
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.SuperficieTarjeta
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoSecundario
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 /**
  * Pantalla de Calificaciones de StudyHub.
@@ -54,7 +50,7 @@ fun PantallaCalificaciones(onMenuClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(FondoPrincipal)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
@@ -91,9 +87,8 @@ private fun BarraSuperiorCalificaciones(onMenuClick: () -> Unit) {
 
         Text(
             text = "Calificaciones",
-            color = TextoPrincipal,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = TipografiaStudyHub.TituloSeccion
         )
     }
 }
@@ -117,9 +112,8 @@ private fun EstadoVacioCalificaciones() {
 
     Text(
         text = "Sin calificaciones",
-        color = TextoPrincipal,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = TipografiaStudyHub.TituloSeccion,
         textAlign = TextAlign.Center
     )
 
@@ -127,7 +121,7 @@ private fun EstadoVacioCalificaciones() {
 
     Text(
         text = "Las calificaciones que añadas aparecerán aquí",
-        color = TextoSecundario,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 16.sp,
         textAlign = TextAlign.Center
     )
@@ -163,7 +157,7 @@ private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
         modifier = modifier
             .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(SuperficieTarjeta)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -178,7 +172,7 @@ private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
 
         Text(
             text = "Última semana",
-            color = TextoPrincipal,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 20.sp,
             modifier = Modifier.weight(1f)
         )
@@ -203,22 +197,22 @@ private fun BotonAgregarCalificacion() {
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(AcentoPrincipal),
+            .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "+",
-            color = IconoOscuro,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 30.sp,
             fontWeight = FontWeight.Normal
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF191919)
+@Preview(showBackground = true, backgroundColor = 0xFF111318)
 @Composable
 fun PantallaCalificacionesPreview() {
-    StudyHub_ApplicationTheme {
+    AppTheme(darkTheme = true, dynamicColor = false) {
         PantallaCalificaciones()
     }
 }

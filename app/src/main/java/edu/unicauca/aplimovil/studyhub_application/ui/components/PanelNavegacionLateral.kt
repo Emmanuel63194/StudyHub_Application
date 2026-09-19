@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.SeleccionMenuLateral
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
 
 /**
  * Identifica cada una de las pantallas navegables desde el menú lateral.
@@ -76,13 +74,13 @@ fun PanelNavegacionLateral(
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .background(FondoPrincipal)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(
             text = "Agenda escolar",
-            color = TextoPrincipal,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -128,7 +126,7 @@ private fun Box1PxDivisor() {
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(TextoPrincipal)
+            .background(MaterialTheme.colorScheme.onBackground)
     )
 }
 
@@ -146,7 +144,10 @@ private fun ElementoMenuLateral(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(if (seleccionado) SeleccionMenuLateral else androidx.compose.ui.graphics.Color.Transparent)
+            .background(
+                if (seleccionado) MaterialTheme.colorScheme.primaryContainer
+                else androidx.compose.ui.graphics.Color.Transparent
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -162,7 +163,7 @@ private fun ElementoMenuLateral(
 
         Text(
             text = opcion.texto,
-            color = TextoPrincipal,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 20.sp
         )
     }

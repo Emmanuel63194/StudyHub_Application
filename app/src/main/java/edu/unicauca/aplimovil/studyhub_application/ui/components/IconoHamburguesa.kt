@@ -1,12 +1,12 @@
 package edu.unicauca.aplimovil.studyhub_application.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
 
 /**
  * Icono de menú hamburguesa construido mediante código (sin imagen externa).
@@ -14,6 +14,8 @@ import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
  */
 @Composable
 fun IconoHamburguesa(modifier: Modifier = Modifier) {
+    val colorLinea = MaterialTheme.colorScheme.onBackground
+
     Canvas(modifier = modifier) {
         val grosorLinea = 2.dp.toPx()
         val separacion = size.height / 2f
@@ -21,7 +23,7 @@ fun IconoHamburguesa(modifier: Modifier = Modifier) {
         for (i in 0..2) {
             val y = i * separacion
             drawLine(
-                color = TextoPrincipal,
+                color = colorLinea,
                 start = Offset(0f, y),
                 end = Offset(size.width, y),
                 strokeWidth = grosorLinea,

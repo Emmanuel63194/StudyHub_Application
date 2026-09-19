@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,14 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.AcentoPrincipal
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.SuperficieTarjeta
-import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoSecundario
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 /**
  * Tarjeta reutilizable que representa el resumen de eventos de un día
@@ -38,7 +35,7 @@ fun TarjetaResumen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(25.dp))
-            .background(SuperficieTarjeta)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(20.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -46,9 +43,8 @@ fun TarjetaResumen(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Eventos pendientes",
-                color = AcentoPrincipal,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
+                color = MaterialTheme.colorScheme.primary,
+                style = TipografiaStudyHub.ResaltadoTarjeta
             )
         }
 
@@ -67,8 +63,8 @@ fun TarjetaResumen(modifier: Modifier = Modifier) {
 
         Text(
             text = "No hay trabajos o examenes por realizar en el momento.",
-            color = TextoSecundario,
-            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = TipografiaStudyHub.MensajeEstadoVacio,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
