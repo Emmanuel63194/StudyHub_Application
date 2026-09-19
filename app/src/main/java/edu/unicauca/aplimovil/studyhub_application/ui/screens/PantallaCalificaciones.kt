@@ -1,0 +1,224 @@
+package edu.unicauca.aplimovil.studyhub_application.ui.screens
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import edu.unicauca.aplimovil.studyhub_application.R
+import edu.unicauca.aplimovil.studyhub_application.ui.components.DireccionFlecha
+import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
+import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AcentoPrincipal
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.FondoPrincipal
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.IconoOscuro
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.StudyHub_ApplicationTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.SuperficieTarjeta
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoPrincipal
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.TextoSecundario
+
+/**
+ * Pantalla de Calificaciones de StudyHub.
+ *
+ * [onMenuClick] se invoca al pulsar el ícono de hamburguesa y permite que
+ * quien aloje esta pantalla (MainActivity) abra el Navigation Drawer
+ * centralizado de la aplicación.
+ */
+@Composable
+fun PantallaCalificaciones(onMenuClick: () -> Unit = {}) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(FondoPrincipal)
+            .statusBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        BarraSuperiorCalificaciones(onMenuClick = onMenuClick)
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .offset(x = 5.dp, y = (-45).dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            EstadoVacioCalificaciones()
+        }
+
+        SeccionFiltroYAccionCalificaciones()
+    }
+}
+
+/**
+ * Barra superior: icono de menú y título "Calificaciones".
+ * El icono de menú abre el Navigation Drawer mediante [onMenuClick].
+ */
+@Composable
+private fun BarraSuperiorCalificaciones(onMenuClick: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconoHamburguesa(
+            modifier = Modifier
+                .size(width = 24.dp, height = 15.dp)
+                .clickable(onClick = onMenuClick)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Text(
+            text = "Calificaciones",
+            color = TextoPrincipal,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+/**
+ * Sección central con la ilustración de buzón vacío, título y texto descriptivo,
+ * mostrada cuando todavía no existen calificaciones registradas.
+ */
+@Composable
+private fun EstadoVacioCalificaciones() {
+    Image(
+        painter = painterResource(id = R.drawable.buzon_vacio),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .height(210.dp),
+        contentScale = ContentScale.Fit
+    )
+
+    Spacer(modifier = Modifier.height(20.dp))
+
+    Text(
+        text = "Sin calificaciones",
+        color = TextoPrincipal,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = "Las calificaciones que añadas aparecerán aquí",
+        color = TextoSecundario,
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center
+    )
+}
+
+/**
+ * Sección inferior con el selector de filtro y el botón de acción para
+ * agregar una nueva calificación. Ambos son puramente decorativos por ahora.
+ */
+@Composable
+private fun SeccionFiltroYAccionCalificaciones() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = (-40).dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SelectorFiltroCalificaciones(modifier = Modifier.weight(1f))
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        BotonAgregarCalificacion()
+    }
+}
+
+/**
+ * Contenedor de filtro con icono de calendario, texto "Última semana" y
+ * flecha desplegable reutilizada de IconoFlecha.
+ */
+@Composable
+private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .height(56.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(SuperficieTarjeta)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.calendario_blanco),
+            contentDescription = null,
+            modifier = Modifier.size(width = 24.dp, height = 21.dp),
+            contentScale = ContentScale.Fit
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = "Última semana",
+            color = TextoPrincipal,
+            fontSize = 20.sp,
+            modifier = Modifier.weight(1f)
+        )
+
+        // Flecha reutilizada de IconoFlecha.kt, rotada para apuntar hacia abajo.
+        IconoFlecha(
+            direccion = DireccionFlecha.DERECHA,
+            modifier = Modifier
+                .rotate(90f)
+                .offset(x = (16).dp)
+        )
+    }
+}
+
+/**
+ * Botón de acción flotante para agregar una nueva calificación.
+ * Es puramente decorativo por ahora: no ejecuta ninguna acción.
+ */
+@Composable
+private fun BotonAgregarCalificacion() {
+    Box(
+        modifier = Modifier
+            .size(56.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(AcentoPrincipal),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "+",
+            color = IconoOscuro,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Normal
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF191919)
+@Composable
+fun PantallaCalificacionesPreview() {
+    StudyHub_ApplicationTheme {
+        PantallaCalificaciones()
+    }
+}
