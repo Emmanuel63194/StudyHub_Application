@@ -42,11 +42,11 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        // Encabezado: menú hamburguesa + título "Resumen"
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconoHamburguesa(
                 modifier = Modifier
-                    .size(width = 24.dp, height = 15.dp)
+                    .size(width = 34.dp, height = 34.dp)
                     .clickable(onClick = onMenuClick)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -59,13 +59,14 @@ fun PantallaInicio(onMenuClick: () -> Unit = {}) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Sección "Hoy"
         Text(
             text = "Hoy",
             color = MaterialTheme.colorScheme.onBackground,
             style = TipografiaStudyHub.TituloSeccion
         )
+
         Spacer(modifier = Modifier.height(12.dp))
+
         TarjetaResumen()
 
         Spacer(modifier = Modifier.height(28.dp))

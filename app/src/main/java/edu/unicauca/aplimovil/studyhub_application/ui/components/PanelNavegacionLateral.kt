@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -24,9 +25,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
+import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaInicio
+import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 
 /**
  * Identifica cada una de las pantallas navegables desde el menú lateral.
@@ -45,16 +49,15 @@ enum class PantallaSeleccionada {
 private data class OpcionMenu(
     val pantalla: PantallaSeleccionada,
     val texto: String,
-    val iconoResId: Int,
-    val implementada: Boolean
+    val iconoResId: Int
 )
 
 private val OpcionesMenu = listOf(
-    OpcionMenu(PantallaSeleccionada.RESUMEN, "Resumen", R.drawable.casa_home, implementada = true),
-    OpcionMenu(PantallaSeleccionada.CALENDARIO, "Calendario", R.drawable.calendario_icono, implementada = true),
-    OpcionMenu(PantallaSeleccionada.ASIGNATURAS, "Asignaturas", R.drawable.asignatura_icono, implementada = true),
-    OpcionMenu(PantallaSeleccionada.CALIFICACIONES, "Calificaciones", R.drawable.calificacion_icono, implementada = true),
-    OpcionMenu(PantallaSeleccionada.CUESTIONARIOS, "Cuestionarios", R.drawable.cuestionario_icono, implementada = true)
+    OpcionMenu(PantallaSeleccionada.RESUMEN, "Resumen", R.drawable.casa_home),
+    OpcionMenu(PantallaSeleccionada.CALENDARIO, "Calendario", R.drawable.calendario_icono),
+    OpcionMenu(PantallaSeleccionada.ASIGNATURAS, "Asignaturas", R.drawable.asignatura_icono),
+    OpcionMenu(PantallaSeleccionada.CALIFICACIONES, "Calificaciones", R.drawable.calificacion_icono),
+    OpcionMenu(PantallaSeleccionada.CUESTIONARIOS, "Cuestionarios", R.drawable.cuestionario_icono)
 )
 
 /**
@@ -96,9 +99,7 @@ fun PanelNavegacionLateral(
                 opcion = opcion,
                 seleccionado = opcion.pantalla == pantallaActual,
                 onClick = {
-                    if (opcion.implementada) {
-                        alSeleccionarOpcion(opcion.pantalla)
-                    }
+                    alSeleccionarOpcion(opcion.pantalla)
                 }
             )
         }
@@ -166,5 +167,36 @@ private fun ElementoMenuLateral(
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 20.sp
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VistaPreviaMenuConPantalla() {
+    AppTheme(darkTheme = true, dynamicColor = false) {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+
+            PantallaInicio(
+                onMenuClick = {}
+            )
+
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f)
+                    )
+            )
+
+            PanelNavegacionLateral(
+                pantallaActual = PantallaSeleccionada.RESUMEN,
+                alSeleccionarOpcion = {},
+                modifier = Modifier.width(310.dp)
+            )
+        }
     }
 }

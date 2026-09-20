@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
-import edu.unicauca.aplimovil.studyhub_application.ui.components.DireccionFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
@@ -79,7 +78,7 @@ private fun BarraSuperiorCalificaciones(onMenuClick: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconoHamburguesa(
             modifier = Modifier
-                .size(width = 24.dp, height = 15.dp)
+                .size(width = 34.dp, height = 34.dp)
                 .clickable(onClick = onMenuClick)
         )
 
@@ -177,12 +176,11 @@ private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
             modifier = Modifier.weight(1f)
         )
 
-        // Flecha reutilizada de IconoFlecha.kt, rotada para apuntar hacia abajo.
         IconoFlecha(
-            direccion = DireccionFlecha.DERECHA,
             modifier = Modifier
+                .size(width = 60.dp, height = 40.dp)
                 .rotate(90f)
-                .offset(x = (16).dp)
+                .offset(y = (-17).dp)
         )
     }
 }

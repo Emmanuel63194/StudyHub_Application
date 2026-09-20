@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
-import edu.unicauca.aplimovil.studyhub_application.ui.components.DireccionFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
@@ -109,7 +109,7 @@ private fun BarraSuperiorCalendario(onMenuClick: () -> Unit) {
     ) {
         IconoHamburguesa(
             modifier = Modifier
-                .size(width = 24.dp, height = 15.dp)
+                .size(width = 34.dp, height = 34.dp)
                 .clickable(onClick = onMenuClick)
         )
 
@@ -192,7 +192,13 @@ private fun NavegacionMes() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconoFlecha(direccion = DireccionFlecha.IZQUIERDA)
+
+        IconoFlecha(
+            modifier = Modifier
+                .size(width = 60.dp, height = 40.dp)
+                .offset(x = -3.dp)
+                .rotate(180f)
+        )
 
         Text(
             text = "Agosto 2026",
@@ -200,7 +206,11 @@ private fun NavegacionMes() {
             style = TipografiaStudyHub.TituloSeccion
         )
 
-        IconoFlecha(direccion = DireccionFlecha.DERECHA)
+        IconoFlecha(
+            modifier = Modifier
+                .size(width = 60.dp, height = 40.dp)
+                .offset(x = 3.dp)
+        )
     }
 }
 

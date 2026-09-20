@@ -1,34 +1,24 @@
 package edu.unicauca.aplimovil.studyhub_application.ui.components
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import edu.unicauca.aplimovil.studyhub_application.R
 
 /**
- * Icono de menú hamburguesa construido mediante código (sin imagen externa).
- * Es únicamente decorativo: no ejecuta ninguna acción en esta etapa.
+ * Icono de menú hamburguesa basado en la imagen hamburguesa_icono.png.
+ * El tamaño y el comportamiento (clickable) los define quien lo usa
+ * mediante [modifier] (24 x 15 dp en las pantallas).
+ * Es únicamente decorativo: no ejecuta ninguna acción por sí mismo.
  */
 @Composable
 fun IconoHamburguesa(modifier: Modifier = Modifier) {
-    val colorLinea = MaterialTheme.colorScheme.onBackground
-
-    Canvas(modifier = modifier) {
-        val grosorLinea = 2.dp.toPx()
-        val separacion = size.height / 2f
-
-        for (i in 0..2) {
-            val y = i * separacion
-            drawLine(
-                color = colorLinea,
-                start = Offset(0f, y),
-                end = Offset(size.width, y),
-                strokeWidth = grosorLinea,
-                cap = StrokeCap.Round
-            )
-        }
-    }
+    Image(
+        painter = painterResource(id = R.drawable.hamburguesa_icono),
+        contentDescription = null,
+        modifier = modifier,
+        contentScale = ContentScale.FillBounds
+    )
 }

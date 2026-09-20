@@ -76,7 +76,7 @@ private fun BarraSuperiorAsignaturas(onMenuClick: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconoHamburguesa(
             modifier = Modifier
-                .size(width = 24.dp, height = 15.dp)
+                .size(width = 34.dp, height = 34.dp)
                 .clickable(onClick = onMenuClick)
         )
 
