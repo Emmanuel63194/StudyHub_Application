@@ -32,9 +32,6 @@ import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaInicio
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 
-/**
- * Identifica cada una de las pantallas navegables desde el menú lateral.
- */
 enum class PantallaSeleccionada {
     RESUMEN,
     CALENDARIO,
@@ -43,9 +40,6 @@ enum class PantallaSeleccionada {
     CUESTIONARIOS
 }
 
-/**
- * Representa una opción individual del menú lateral.
- */
 private data class OpcionMenu(
     val pantalla: PantallaSeleccionada,
     val texto: String,
@@ -60,14 +54,6 @@ private val OpcionesMenu = listOf(
     OpcionMenu(PantallaSeleccionada.CUESTIONARIOS, "Cuestionarios", R.drawable.cuestionario_icono)
 )
 
-/**
- * Contenido del Navigation Drawer lateral de StudyHub.
- *
- * Muestra el encabezado de la aplicación, la lista de opciones de
- * navegación (marcando cuál corresponde a la pantalla actual) y el logo
- * en la parte inferior. La navegación real y el cierre del panel se
- * delegan al llamador mediante [alSeleccionarOpcion].
- */
 @Composable
 fun PanelNavegacionLateral(
     pantallaActual: PantallaSeleccionada,
@@ -118,9 +104,6 @@ fun PanelNavegacionLateral(
     }
 }
 
-/**
- * Línea divisoria entre el encabezado y las opciones de navegación.
- */
 @Composable
 private fun Box1PxDivisor() {
     androidx.compose.foundation.layout.Box(
@@ -131,10 +114,6 @@ private fun Box1PxDivisor() {
     )
 }
 
-/**
- * Elemento individual de la lista de navegación: icono + texto, con
- * fondo resaltado cuando corresponde a la pantalla actualmente activa.
- */
 @Composable
 private fun ElementoMenuLateral(
     opcion: OpcionMenu,

@@ -40,11 +40,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/**
- * Aloja el Navigation Drawer centralizado de la aplicación y decide, según
- * la opción seleccionada, cuál de las pantallas existentes se muestra.
- * Es el único punto de la app que conoce la navegación entre pantallas.
- */
 @Composable
 private fun ContenidoPrincipalApp() {
     val estadoDrawer = rememberDrawerState(initialValue = DrawerValue.Closed)

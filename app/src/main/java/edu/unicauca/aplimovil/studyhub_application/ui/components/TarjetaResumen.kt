@@ -30,11 +30,6 @@ import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-/**
- * Tarjeta reutilizable que representa el resumen de eventos de un día
- * (utilizada tanto por la sección "Hoy" como por la sección "Mañana").
- * Es puramente visual/decorativa: no ejecuta ninguna acción.
- */
 @Composable
 fun TarjetaResumen(modifier: Modifier = Modifier) {
     Column(
@@ -77,12 +72,6 @@ fun TarjetaResumen(modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * Icono distintivo de "libreta/marcador".
- * Compuesto por: círculo base dibujado en código + imagen libreta_icono.png
- * centrada (12 x 15 dp), que reemplaza al rectángulo y al pequeño elemento
- * interior que antes se dibujaban en código.
- */
 @Composable
 private fun IconoLibreta(modifier: Modifier = Modifier) {
     val colorAcento = MaterialTheme.colorScheme.primary
@@ -91,7 +80,7 @@ private fun IconoLibreta(modifier: Modifier = Modifier) {
         modifier = modifier.size(30.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Círculo base (30 x 30 dp), color de acento
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 color = colorAcento,
@@ -100,8 +89,6 @@ private fun IconoLibreta(modifier: Modifier = Modifier) {
             )
         }
 
-        // Imagen superpuesta (12 x 15 dp), centrada: misma posición y tamaño
-        // que tenía el rectángulo dibujado en código.
         Image(
             painter = painterResource(id = R.drawable.libreta_icono),
             contentDescription = null,

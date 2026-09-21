@@ -38,11 +38,8 @@ import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburgues
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-// Nombres de los días de la semana (encabezado del calendario).
 private val DiasSemana = listOf("D", "L", "Ma", "Mi", "J", "V", "S")
 
-// Cuadrícula de referencia para agosto de 2026 (agosto 1 cae en sábado).
-// "null" representa una celda vacía dentro de la cuadrícula de 7 columnas.
 private val DiasAgosto2026: List<List<Int?>> = listOf(
     listOf(null, null, null, null, null, null, 1),
     listOf(2, 3, 4, 5, 6, 7, 8),
@@ -70,7 +67,6 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
             .statusBarsPadding()
     ) {
 
-        // Todo lo demás conserva los 20 dp
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,10 +77,8 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // SOLO el calendario ocupa todo el ancho
         ContenedorCalendario()
 
-        // Volvemos a los 20 dp para el resto
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,10 +91,6 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
     }
 }
 
-/**
- * Barra superior: icono de menú, título "Calendario" y botón "Agregar".
- * El icono de menú abre el Navigation Drawer mediante [onMenuClick].
- */
 @Composable
 private fun BarraSuperiorCalendario(onMenuClick: () -> Unit) {
     Row(
@@ -126,38 +116,27 @@ private fun BarraSuperiorCalendario(onMenuClick: () -> Unit) {
     }
 }
 
-/**
- * Botón "Agregar" con forma de píldora. Únicamente decorativo por ahora.
- */
 @Composable
 private fun BotonAgregar() {
     Box(
         modifier = Modifier
             .width(107.dp)
             .height(35.dp)
-            .clip(RoundedCornerShape(50)),
+            .background(
+                MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(50)
+            ),
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Agregar",
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
+        Text(
+            text = "Agregar",
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
-/**
- * Contenedor principal del calendario: navegación de mes, encabezado de
- * días de la semana y cuadrícula de días.
- */
 @Composable
 private fun ContenedorCalendario() {
     Column(
@@ -181,10 +160,6 @@ private fun ContenedorCalendario() {
     }
 }
 
-/**
- * Encabezado con el nombre del mes actual y las flechas de navegación.
- * Las flechas son únicamente decorativas por ahora.
- */
 @Composable
 private fun NavegacionMes() {
     Row(
@@ -214,9 +189,6 @@ private fun NavegacionMes() {
     }
 }
 
-/**
- * Encabezado con las iniciales de los días de la semana.
- */
 @Composable
 private fun EncabezadoDiasSemana() {
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -232,9 +204,6 @@ private fun EncabezadoDiasSemana() {
     }
 }
 
-/**
- * Una fila (semana) de la cuadrícula de días del calendario.
- */
 @Composable
 private fun FilaDeDias(semana: List<Int?>) {
     Row(
@@ -255,10 +224,6 @@ private fun FilaDeDias(semana: List<Int?>) {
     }
 }
 
-/**
- * Celda individual de un día dentro de la cuadrícula.
- * El día seleccionado se destaca con un círculo de acento.
- */
 @Composable
 private fun CeldaDia(dia: Int) {
     val estaSeleccionado = dia == DiaSeleccionado
@@ -282,9 +247,6 @@ private fun CeldaDia(dia: Int) {
     }
 }
 
-/**
- * Estado vacío mostrado debajo del calendario cuando no existen eventos.
- */
 @Composable
 private fun EstadoVacioEventos() {
     Column(

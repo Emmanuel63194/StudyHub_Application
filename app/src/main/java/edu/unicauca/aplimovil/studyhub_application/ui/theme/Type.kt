@@ -6,34 +6,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/**
- * Tipografía centralizada de StudyHub.
- *
- * Utiliza la familia sans-serif del sistema, proporcionando
- * una apariencia limpia, moderna y legible.
- */
 private val FamiliaTipograficaStudyHub = FontFamily.SansSerif
 
-/**
- * Estilos tipográficos específicos de StudyHub.
- */
 object TipografiaStudyHub {
 
-    // "Resumen", "Hoy" y "Mañana"
     val TituloSeccion = TextStyle(
         fontFamily = FamiliaTipograficaStudyHub,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp
     )
 
-    // "Eventos pendientes"
     val ResaltadoTarjeta = TextStyle(
         fontFamily = FamiliaTipograficaStudyHub,
         fontWeight = FontWeight.Medium,
         fontSize = 20.sp
     )
 
-    // Mensaje de estado vacío
     val MensajeEstadoVacio = TextStyle(
         fontFamily = FamiliaTipograficaStudyHub,
         fontWeight = FontWeight.Normal,
@@ -41,14 +29,6 @@ object TipografiaStudyHub {
     )
 }
 
-/**
- * Configuración tipográfica base de Material3.
- *
- * Conserva la escala (tamaños, pesos e interlineado) por defecto de
- * Material 3 y fija explícitamente la familia SansSerif de StudyHub en
- * todos los estilos. Los estilos específicos de StudyHub se encuentran
- * en TipografiaStudyHub y coexisten con esta escala.
- */
 private val TipografiaBaseM3 = Typography()
 
 val TipografiaMaterialStudyHub = Typography(

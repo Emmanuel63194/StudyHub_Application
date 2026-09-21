@@ -25,13 +25,6 @@ import edu.unicauca.aplimovil.studyhub_application.ui.components.TarjetaResumen
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-/**
- * Pantalla principal (Resumen) de StudyHub.
- *
- * [onMenuClick] se invoca al pulsar el ícono de hamburguesa y permite que
- * quien aloje esta pantalla (MainActivity) abra el Navigation Drawer
- * centralizado de la aplicación.
- */
 @Composable
 fun PantallaInicio(onMenuClick: () -> Unit = {}) {
     Column(

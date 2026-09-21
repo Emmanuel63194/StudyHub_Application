@@ -35,17 +35,6 @@ import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburgues
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-/**
- * Pantalla de Cuestionarios de StudyHub.
- *
- * Es una variante visual de PantallaAsignaturas/PantallaCalificaciones,
- * pero sin selector inferior: en su lugar utiliza únicamente un FAB en la
- * esquina inferior derecha.
- *
- * [onMenuClick] se invoca al pulsar el ícono de hamburguesa y permite que
- * quien aloje esta pantalla (MainActivity) abra el Navigation Drawer
- * centralizado de la aplicación.
- */
 @Composable
 fun PantallaCuestionarios(onMenuClick: () -> Unit = {}) {
     Box(
@@ -81,10 +70,6 @@ fun PantallaCuestionarios(onMenuClick: () -> Unit = {}) {
     }
 }
 
-/**
- * Barra superior: icono de menú y título "Cuestionarios".
- * El icono de menú abre el Navigation Drawer mediante [onMenuClick].
- */
 @Composable
 private fun BarraSuperiorCuestionarios(onMenuClick: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -104,10 +89,6 @@ private fun BarraSuperiorCuestionarios(onMenuClick: () -> Unit) {
     }
 }
 
-/**
- * Sección central con la ilustración de cuestionario vacío, título y texto
- * descriptivo, mostrada cuando todavía no existen cuestionarios registrados.
- */
 @Composable
 private fun EstadoVacioCuestionarios() {
     Image(
@@ -138,10 +119,6 @@ private fun EstadoVacioCuestionarios() {
     )
 }
 
-/**
- * Botón de acción flotante para agregar un nuevo cuestionario.
- * Es puramente decorativo por ahora: no ejecuta ninguna acción.
- */
 @Composable
 private fun BotonAgregarCuestionario(modifier: Modifier = Modifier) {
     Box(

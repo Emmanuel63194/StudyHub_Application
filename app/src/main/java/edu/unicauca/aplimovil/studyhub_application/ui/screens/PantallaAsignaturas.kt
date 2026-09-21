@@ -35,13 +35,6 @@ import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburgues
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-/**
- * Pantalla de Asignaturas de StudyHub.
- *
- * [onMenuClick] se invoca al pulsar el ícono de hamburguesa y permite que
- * quien aloje esta pantalla (MainActivity) abra el Navigation Drawer
- * centralizado de la aplicación.
- */
 @Composable
 fun PantallaAsignaturas(onMenuClick: () -> Unit = {}) {
     Column(
@@ -67,10 +60,6 @@ fun PantallaAsignaturas(onMenuClick: () -> Unit = {}) {
     }
 }
 
-/**
- * Barra superior: icono de menú y título "Asignaturas".
- * El icono de menú abre el Navigation Drawer mediante [onMenuClick].
- */
 @Composable
 private fun BarraSuperiorAsignaturas(onMenuClick: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -90,10 +79,6 @@ private fun BarraSuperiorAsignaturas(onMenuClick: () -> Unit) {
     }
 }
 
-/**
- * Sección central con la ilustración de buzón vacío, título y texto descriptivo,
- * mostrada cuando todavía no existen asignaturas registradas.
- */
 @Composable
 private fun EstadoVacioAsignaturas() {
     Image(
@@ -124,10 +109,6 @@ private fun EstadoVacioAsignaturas() {
     )
 }
 
-/**
- * Sección inferior con el botón de acción para agregar una nueva asignatura.
- * Es puramente decorativo por ahora: no ejecuta ninguna acción.
- */
 @Composable
 private fun SeccionAccion() {
     Row(
@@ -140,10 +121,6 @@ private fun SeccionAccion() {
     }
 }
 
-/**
- * Botón de acción flotante para agregar una nueva asignatura.
- * Es puramente decorativo por ahora: no ejecuta ninguna acción.
- */
 @Composable
 private fun BotonAgregarAsignatura() {
     Box(

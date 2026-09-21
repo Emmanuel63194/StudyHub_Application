@@ -37,13 +37,6 @@ import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburgues
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-/**
- * Pantalla de Calificaciones de StudyHub.
- *
- * [onMenuClick] se invoca al pulsar el ícono de hamburguesa y permite que
- * quien aloje esta pantalla (MainActivity) abra el Navigation Drawer
- * centralizado de la aplicación.
- */
 @Composable
 fun PantallaCalificaciones(onMenuClick: () -> Unit = {}) {
     Column(
@@ -69,10 +62,6 @@ fun PantallaCalificaciones(onMenuClick: () -> Unit = {}) {
     }
 }
 
-/**
- * Barra superior: icono de menú y título "Calificaciones".
- * El icono de menú abre el Navigation Drawer mediante [onMenuClick].
- */
 @Composable
 private fun BarraSuperiorCalificaciones(onMenuClick: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -92,10 +81,6 @@ private fun BarraSuperiorCalificaciones(onMenuClick: () -> Unit) {
     }
 }
 
-/**
- * Sección central con la ilustración de buzón vacío, título y texto descriptivo,
- * mostrada cuando todavía no existen calificaciones registradas.
- */
 @Composable
 private fun EstadoVacioCalificaciones() {
     Image(
@@ -126,10 +111,6 @@ private fun EstadoVacioCalificaciones() {
     )
 }
 
-/**
- * Sección inferior con el selector de filtro y el botón de acción para
- * agregar una nueva calificación. Ambos son puramente decorativos por ahora.
- */
 @Composable
 private fun SeccionFiltroYAccionCalificaciones() {
     Row(
@@ -146,10 +127,6 @@ private fun SeccionFiltroYAccionCalificaciones() {
     }
 }
 
-/**
- * Contenedor de filtro con icono de calendario, texto "Última semana" y
- * flecha desplegable reutilizada de IconoFlecha.
- */
 @Composable
 private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
     Row(
@@ -185,10 +162,6 @@ private fun SelectorFiltroCalificaciones(modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * Botón de acción flotante para agregar una nueva calificación.
- * Es puramente decorativo por ahora: no ejecuta ninguna acción.
- */
 @Composable
 private fun BotonAgregarCalificacion() {
     Box(
