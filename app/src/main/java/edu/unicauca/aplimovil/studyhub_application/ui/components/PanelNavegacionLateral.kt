@@ -47,11 +47,35 @@ private data class OpcionMenu(
 )
 
 private val OpcionesMenu = listOf(
-    OpcionMenu(PantallaSeleccionada.RESUMEN, "Resumen", R.drawable.casa_home),
-    OpcionMenu(PantallaSeleccionada.CALENDARIO, "Calendario", R.drawable.calendario_icono),
-    OpcionMenu(PantallaSeleccionada.ASIGNATURAS, "Asignaturas", R.drawable.asignatura_icono),
-    OpcionMenu(PantallaSeleccionada.CALIFICACIONES, "Calificaciones", R.drawable.calificacion_icono),
-    OpcionMenu(PantallaSeleccionada.CUESTIONARIOS, "Cuestionarios", R.drawable.cuestionario_icono)
+    OpcionMenu(
+        PantallaSeleccionada.RESUMEN,
+        "Resumen",
+        R.drawable.casa_home
+    ),
+
+    OpcionMenu(
+        PantallaSeleccionada.CALENDARIO,
+        "Calendario",
+        R.drawable.calendario_icono
+    ),
+
+    OpcionMenu(
+        PantallaSeleccionada.ASIGNATURAS,
+        "Asignaturas",
+        R.drawable.asignatura_icono
+    ),
+
+    OpcionMenu(
+        PantallaSeleccionada.CALIFICACIONES,
+        "Calificaciones",
+        R.drawable.calificacion_icono
+    ),
+
+    OpcionMenu(
+        PantallaSeleccionada.CUESTIONARIOS,
+        "Cuestionarios",
+        R.drawable.cuestionario_icono
+    )
 )
 
 @Composable
@@ -65,8 +89,12 @@ fun PanelNavegacionLateral(
             .fillMaxHeight()
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(
+                horizontal = 20.dp,
+                vertical = 16.dp
+            )
     ) {
+
         Text(
             text = "Agenda escolar",
             color = MaterialTheme.colorScheme.onBackground,
@@ -81,9 +109,12 @@ fun PanelNavegacionLateral(
         Spacer(modifier = Modifier.height(16.dp))
 
         OpcionesMenu.forEach { opcion ->
+
             ElementoMenuLateral(
                 opcion = opcion,
+
                 seleccionado = opcion.pantalla == pantallaActual,
+
                 onClick = {
                     alSeleccionarOpcion(opcion.pantalla)
                 }
@@ -93,7 +124,9 @@ fun PanelNavegacionLateral(
         Spacer(modifier = Modifier.weight(1f))
 
         Image(
-            painter = painterResource(id = R.drawable.logo_principal),
+            painter = painterResource(
+                id = R.drawable.logo_principal
+            ),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,7 +143,9 @@ private fun Box1PxDivisor() {
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(
+                MaterialTheme.colorScheme.onBackground
+            )
     )
 }
 
@@ -125,15 +160,24 @@ private fun ElementoMenuLateral(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(
-                if (seleccionado) MaterialTheme.colorScheme.primaryContainer
-                else androidx.compose.ui.graphics.Color.Transparent
+                if (seleccionado) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    androidx.compose.ui.graphics.Color.Transparent
+                }
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 14.dp),
+            .padding(
+                horizontal = 12.dp,
+                vertical = 14.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Image(
-            painter = painterResource(id = opcion.iconoResId),
+            painter = painterResource(
+                id = opcion.iconoResId
+            ),
             contentDescription = null,
             modifier = Modifier.size(26.dp),
             contentScale = ContentScale.Fit
@@ -152,11 +196,18 @@ private fun ElementoMenuLateral(
 @Preview(showBackground = true)
 @Composable
 private fun VistaPreviaMenuConPantalla() {
-    AppTheme(darkTheme = true, dynamicColor = false) {
+
+    AppTheme(
+        darkTheme = true,
+        dynamicColor = false
+    ) {
+
         androidx.compose.foundation.layout.Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(
+                    MaterialTheme.colorScheme.background
+                )
         ) {
 
             PantallaInicio(
@@ -167,7 +218,9 @@ private fun VistaPreviaMenuConPantalla() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f)
+                        androidx.compose.ui.graphics.Color.Black.copy(
+                            alpha = 0.5f
+                        )
                     )
             )
 
