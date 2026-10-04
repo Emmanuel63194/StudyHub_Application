@@ -9,9 +9,6 @@ import androidx.room.Update
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CuestionarioEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Operaciones de acceso a datos para [CuestionarioEntity].
- */
 @Dao
 interface CuestionarioDao {
 
@@ -27,6 +24,7 @@ interface CuestionarioDao {
     @Query("SELECT * FROM cuestionarios ORDER BY id DESC")
     fun obtenerTodos(): Flow<List<CuestionarioEntity>>
 
+    /** Se obtiene un cuestionario por su id para poder editarlo */
     @Query("SELECT * FROM cuestionarios WHERE id = :cuestionarioId")
     suspend fun obtenerPorId(cuestionarioId: Long): CuestionarioEntity?
 }

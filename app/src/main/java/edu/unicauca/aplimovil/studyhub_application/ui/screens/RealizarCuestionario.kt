@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
@@ -54,7 +55,7 @@ fun RealizarCuestionario(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ColorFondo)
+                .background(MaterialTheme.colorScheme.background)
                 .statusBarsPadding()
         ) {
             BarraSuperiorRealizar(
@@ -106,6 +107,7 @@ fun RealizarCuestionario(
             putAll(respuestasIniciales)
         }
     }
+
     val preguntas = cuestionario.preguntas
 
     val total = preguntas.size
@@ -125,7 +127,7 @@ fun RealizarCuestionario(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorFondo)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
 
@@ -167,7 +169,6 @@ fun RealizarCuestionario(
                 )
             ) {
 
-                // Espacio entre el título y la primera pregunta
                 item {
                     Spacer(
                         modifier = Modifier.height(20.dp)
@@ -192,7 +193,6 @@ fun RealizarCuestionario(
                         }
                     )
 
-                    // Espacio entre bloques de preguntas
                     if (indicePregunta < preguntas.lastIndex) {
                         Spacer(
                             modifier = Modifier.height(40.dp)
@@ -218,7 +218,6 @@ fun RealizarCuestionario(
         }
     }
 }
-
 
 @Composable
 private fun BarraSuperiorRealizar(
@@ -284,7 +283,7 @@ private fun BloquePreguntaRealizar(
 
         ContenedorTexto(
             texto = pregunta.texto,
-            fondo = ColorSuperficie
+            fondo = MaterialTheme.colorScheme.surfaceContainer
         )
 
         pregunta.respuestas.forEachIndexed { indiceRespuesta, respuesta ->
@@ -302,7 +301,7 @@ private fun BloquePreguntaRealizar(
                     ColorIncorrecta
 
                 else ->
-                    ColorSuperficie
+                    MaterialTheme.colorScheme.surfaceContainer
             }
 
             val mostrarCheck =
@@ -480,8 +479,6 @@ private fun PreviewRealizarCuestionario() {
         cuestionario = cuestionario,
         onVolver = {},
 
-        // Simula que ambas preguntas ya fueron respondidas
-        // y que en ambas se seleccionó la primera respuesta.
         respuestasIniciales = mapOf(
             0 to 0,
             1 to 0

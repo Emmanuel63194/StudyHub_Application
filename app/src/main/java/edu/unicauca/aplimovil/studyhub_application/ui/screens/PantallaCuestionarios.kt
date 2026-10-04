@@ -1,5 +1,6 @@
 package edu.unicauca.aplimovil.studyhub_application.ui.screens
 
+import edu.unicauca.aplimovil.studyhub_application.ui.screens.ColorAcento
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,12 +41,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CuestionarioEntity
+import edu.unicauca.aplimovil.studyhub_application.ui.components.CuestionarioRapido
 import edu.unicauca.aplimovil.studyhub_application.ui.components.EliminarRecurso
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
+import edu.unicauca.aplimovil.studyhub_application.ui.viewmodel.CuestionarioViewModel
 
 @Composable
 fun PantallaCuestionarios(
@@ -56,15 +60,21 @@ fun PantallaCuestionarios(
     onEliminarClick: (CuestionarioEntity) -> Unit = {},
     onCuestionarioClick: (CuestionarioEntity) -> Unit = {}
 ) {
-    // Cuestionario que el usuario quiere eliminar (null = modal oculto).
+
+    val cuestionarioViewModel: CuestionarioViewModel = viewModel()
+
     var cuestionarioSeleccionadoParaEliminar by remember {
         mutableStateOf<CuestionarioEntity?>(null)
+    }
+
+    var mostrarCuestionarioRapido by remember {
+        mutableStateOf(false)
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorFondo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -73,7 +83,10 @@ fun PantallaCuestionarios(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             BarraSuperiorCuestionarios(
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                onCuestionarioRapidoClick = {
+                    mostrarCuestionarioRapido = true
+                }
             )
 
             if (cuestionarios.isEmpty()) {
@@ -137,14 +150,43 @@ fun PantallaCuestionarios(
                 }
             )
         }
+
+        if (mostrarCuestionarioRapido) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.Black.copy(
+                            alpha = 0.5f
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+
+                CuestionarioRapido(
+                    viewModel = cuestionarioViewModel,
+
+                    onCerrar = {
+                        mostrarCuestionarioRapido = false
+                    },
+
+                    onCuestionarioGuardado = {
+                        mostrarCuestionarioRapido = false
+                    }
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun BarraSuperiorCuestionarios(
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    onCuestionarioRapidoClick: () -> Unit
 ) {
     Row(
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -168,6 +210,24 @@ private fun BarraSuperiorCuestionarios(
             color = Color.White,
             style = TipografiaStudyHub.TituloSeccion
         )
+
+        Spacer(
+            modifier = Modifier.weight(1f)
+        )
+
+        Icon(
+            painter = painterResource(
+                id = R.drawable.envio_rapido
+            ),
+            contentDescription = "Cuestionario instantáneo",
+            tint = Color.White,
+            modifier = Modifier
+                .offset(x = -11.dp)
+                .size(30.dp)
+                .clickable(
+                    onClick = onCuestionarioRapidoClick
+                )
+        )
     }
 }
 
@@ -183,7 +243,7 @@ private fun TarjetaCuestionario(
             .fillMaxWidth()
             .height(67.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(ColorSuperficie)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(
                 onClick = onCuestionarioClick
             )
@@ -328,3 +388,4 @@ fun PantallaCuestionariosPreview() {
         PantallaCuestionarios()
     }
 }
+

@@ -22,16 +22,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import edu.unicauca.aplimovil.studyhub_application.data.local.BaseDatosStudyHub
+import edu.unicauca.aplimovil.studyhub_application.data.local.entity.AsignaturaEntity
+import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CalificacionEntity
+import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CuestionarioEntity
 import edu.unicauca.aplimovil.studyhub_application.ui.components.PanelNavegacionLateral
 import edu.unicauca.aplimovil.studyhub_application.ui.components.PantallaSeleccionada
+import edu.unicauca.aplimovil.studyhub_application.ui.screens.CrearAsignatura
+import edu.unicauca.aplimovil.studyhub_application.ui.screens.CrearCalificacion
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.CrearCuestionario
-import edu.unicauca.aplimovil.studyhub_application.ui.screens.EditarCuestionario
+import edu.unicauca.aplimovil.studyhub_application.ui.screens.DetalleAsignatura
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaAsignaturas
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCalendario
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCalificaciones
@@ -39,10 +48,14 @@ import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaCuestionar
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.PantallaInicio
 import edu.unicauca.aplimovil.studyhub_application.ui.screens.RealizarCuestionario
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
+import edu.unicauca.aplimovil.studyhub_application.ui.viewmodel.CalendarioViewModel
 import edu.unicauca.aplimovil.studyhub_application.ui.viewmodel.CuestionarioViewModel
+import edu.unicauca.aplimovil.studyhub_application.viewmodel.AsignaturaViewModel
+import edu.unicauca.aplimovil.studyhub_application.viewmodel.CalificacionViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,10 +71,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
 }
 
 @Composable
 private fun ContenidoPrincipalApp() {
+
 
     val navController = rememberNavController()
 
@@ -75,13 +91,54 @@ private fun ContenidoPrincipalApp() {
 
     val cuestionarios by cuestionarioViewModel.cuestionarios.collectAsState()
 
-    // Cuestionario seleccionado para realizar.
-    var cuestionarioSeleccionadoId by remember {
-        mutableStateOf<Long?>(null)
+    val calendarioViewModel: CalendarioViewModel = viewModel()
+
+    val eventos by calendarioViewModel.eventos.collectAsState()
+
+    val eventosCompletados by calendarioViewModel.eventosCompletados.collectAsState()
+
+
+    val baseDatos = BaseDatosStudyHub.obtenerInstancia(LocalContext.current)
+
+    val asignaturaViewModel: AsignaturaViewModel = viewModel(
+        factory = fabricaViewModel {
+            AsignaturaViewModel(
+                baseDatos.asignaturaDao()
+            )
+        }
+    )
+
+    val calificacionViewModel: CalificacionViewModel = viewModel(
+        factory = fabricaViewModel {
+            CalificacionViewModel(
+                baseDatos.calificacionDao()
+            )
+        }
+    )
+
+    val asignaturas by asignaturaViewModel.asignaturas.collectAsState()
+
+    var asignaturaAEditar by remember {
+        mutableStateOf<AsignaturaEntity?>(null)
     }
 
-    // Cuestionario seleccionado para editar.
-    var cuestionarioSeleccionadoParaEditarId by remember {
+
+    var asignaturaDetalleId by remember {
+        mutableStateOf<Int?>(null)
+    }
+
+
+    var calificacionAEditar by remember {
+        mutableStateOf<CalificacionEntity?>(null)
+    }
+
+
+    var cuestionarioAEditar by remember {
+        mutableStateOf<CuestionarioEntity?>(null)
+    }
+
+
+    var cuestionarioSeleccionadoId by remember {
         mutableStateOf<Long?>(null)
     }
 
@@ -92,12 +149,18 @@ private fun ContenidoPrincipalApp() {
     val pantallaActual = when (rutaActual) {
         "resumen" -> PantallaSeleccionada.RESUMEN
         "calendario" -> PantallaSeleccionada.CALENDARIO
-        "asignaturas" -> PantallaSeleccionada.ASIGNATURAS
-        "calificaciones" -> PantallaSeleccionada.CALIFICACIONES
+
+        "asignaturas",
+        "crearAsignatura",
+        "detalleAsignatura" ->
+            PantallaSeleccionada.ASIGNATURAS
+
+        "calificaciones",
+        "crearCalificacion" ->
+            PantallaSeleccionada.CALIFICACIONES
 
         "cuestionarios",
         "crearCuestionario",
-        "editarCuestionario",
         "realizarCuestionario" ->
             PantallaSeleccionada.CUESTIONARIOS
 
@@ -130,12 +193,12 @@ private fun ContenidoPrincipalApp() {
     ModalNavigationDrawer(
         drawerState = estadoDrawer,
 
-        // El panel lateral solo se puede abrir mediante gesto
-        // en las pantallas principales.
         gesturesEnabled =
             rutaActual != "crearCuestionario" &&
-                    rutaActual != "editarCuestionario" &&
-                    rutaActual != "realizarCuestionario",
+                    rutaActual != "realizarCuestionario" &&
+                    rutaActual != "crearAsignatura" &&
+                    rutaActual != "detalleAsignatura" &&
+                    rutaActual != "crearCalificacion",
 
         scrimColor = androidx.compose.ui.graphics.Color.Black.copy(
             alpha = 0.5f
@@ -160,9 +223,11 @@ private fun ContenidoPrincipalApp() {
 
         NavHost(
             navController = navController,
+
+
             startDestination = "resumen",
 
-            // Las pantallas principales no tienen transición.
+
             enterTransition = {
                 EnterTransition.None
             },
@@ -186,6 +251,19 @@ private fun ContenidoPrincipalApp() {
                 PantallaInicio(
                     onMenuClick = {
                         abrirMenu()
+                    },
+
+                    eventos = eventos,
+
+                    eventosCompletados = eventosCompletados,
+
+                    onAlternarCompletado = { eventoId ->
+                        calendarioViewModel.alternarCompletado(eventoId)
+                    },
+
+
+                    onEliminarEvento = { evento ->
+                        calendarioViewModel.eliminarEvento(evento)
                     }
                 )
             }
@@ -195,6 +273,16 @@ private fun ContenidoPrincipalApp() {
                 PantallaCalendario(
                     onMenuClick = {
                         abrirMenu()
+                    },
+
+                    eventos = eventos,
+
+                    onGuardarEvento = { evento ->
+                        calendarioViewModel.guardarEvento(evento)
+                    },
+
+                    onEliminarEvento = { evento ->
+                        calendarioViewModel.eliminarEvento(evento)
                     }
                 )
             }
@@ -202,8 +290,126 @@ private fun ContenidoPrincipalApp() {
             composable("asignaturas") {
 
                 PantallaAsignaturas(
+                    viewModel = asignaturaViewModel,
+
                     onMenuClick = {
                         abrirMenu()
+                    },
+
+
+                    onAgregarClick = {
+                        asignaturaAEditar = null
+                        navController.navigate("crearAsignatura")
+                    },
+
+
+                    onAsignaturaClick = { asignatura ->
+                        asignaturaDetalleId = asignatura.id
+                        navController.navigate("detalleAsignatura")
+                    },
+
+
+                    onEditarClick = { asignatura ->
+                        asignaturaAEditar = asignatura
+                        navController.navigate("crearAsignatura")
+                    }
+                )
+            }
+
+            composable(
+                route = "crearAsignatura",
+
+
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                },
+
+
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                }
+
+            ) {
+
+                CrearAsignatura(
+                    viewModel = asignaturaViewModel,
+                    asignaturaAEditar = asignaturaAEditar,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(
+                route = "detalleAsignatura",
+
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                },
+
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                }
+
+            ) {
+
+                DetalleAsignatura(
+                    asignatura = asignaturas.find {
+                        it.id == asignaturaDetalleId
+                    },
+                    calificacionViewModel = calificacionViewModel,
+                    onBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -211,8 +417,74 @@ private fun ContenidoPrincipalApp() {
             composable("calificaciones") {
 
                 PantallaCalificaciones(
+                    calificacionViewModel = calificacionViewModel,
+                    asignaturaViewModel = asignaturaViewModel,
+
                     onMenuClick = {
                         abrirMenu()
+                    },
+
+                    onAgregarClick = {
+                        calificacionAEditar = null
+                        navController.navigate("crearCalificacion")
+                    },
+
+                    onEditarClick = { calificacion ->
+                        calificacionAEditar = calificacion
+                        navController.navigate("crearCalificacion")
+                    }
+                )
+            }
+
+            composable(
+                route = "crearCalificacion",
+
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                },
+
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { ancho ->
+                            -ancho
+                        }
+                    )
+                },
+
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { ancho ->
+                            ancho
+                        }
+                    )
+                }
+
+            ) {
+
+                CrearCalificacion(
+                    calificacionViewModel = calificacionViewModel,
+                    asignaturaViewModel = asignaturaViewModel,
+                    calificacionAEditar = calificacionAEditar,
+
+                    onBack = {
+                        navController.popBackStack()
+                    },
+
+                    onCrearAsignatura = {
+                        asignaturaAEditar = null
+                        navController.navigate("crearAsignatura")
                     }
                 )
             }
@@ -226,25 +498,23 @@ private fun ContenidoPrincipalApp() {
                         abrirMenu()
                     },
 
-                    // Abrir CrearCuestionario.
                     onAgregarClick = {
+                        cuestionarioAEditar = null
+
                         navController.navigate(
                             "crearCuestionario"
                         )
                     },
 
-                    // Abrir EditarCuestionario.
                     onEditarClick = { cuestionario ->
 
-                        cuestionarioSeleccionadoParaEditarId =
-                            cuestionario.id
+                        cuestionarioAEditar = cuestionario
 
                         navController.navigate(
-                            "editarCuestionario"
+                            "crearCuestionario"
                         )
                     },
 
-                    // Eliminar cuestionario.
                     onEliminarClick = { cuestionario ->
 
                         cuestionarioViewModel.eliminarCuestionario(
@@ -252,7 +522,6 @@ private fun ContenidoPrincipalApp() {
                         )
                     },
 
-                    // Abrir RealizarCuestionario.
                     onCuestionarioClick = { cuestionario ->
 
                         cuestionarioSeleccionadoId =
@@ -268,7 +537,6 @@ private fun ContenidoPrincipalApp() {
             composable(
                 route = "crearCuestionario",
 
-                // La pantalla entra desde la derecha.
                 enterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { ancho ->
@@ -277,7 +545,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // La pantalla actual sale hacia la izquierda.
                 exitTransition = {
                     slideOutHorizontally(
                         targetOffsetX = { ancho ->
@@ -286,7 +553,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // Al volver, CrearCuestionario entra desde la izquierda.
                 popEnterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { ancho ->
@@ -295,7 +561,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // Al volver, la pantalla sale hacia la derecha.
                 popExitTransition = {
                     slideOutHorizontally(
                         targetOffsetX = { ancho ->
@@ -313,75 +578,15 @@ private fun ContenidoPrincipalApp() {
 
                     onCreado = {
                         navController.popBackStack()
-                    }
+                    },
+
+                    cuestionarioAEditar = cuestionarioAEditar
                 )
-            }
-
-            composable(
-                route = "editarCuestionario",
-
-                // La pantalla entra desde la derecha.
-                enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { ancho ->
-                            ancho
-                        }
-                    )
-                },
-
-                // La pantalla actual sale hacia la izquierda.
-                exitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { ancho ->
-                            -ancho
-                        }
-                    )
-                },
-
-                // Al volver, EditarCuestionario entra desde la izquierda.
-                popEnterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { ancho ->
-                            -ancho
-                        }
-                    )
-                },
-
-                // Al volver, la pantalla sale hacia la derecha.
-                popExitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { ancho ->
-                            ancho
-                        }
-                    )
-                }
-
-            ) {
-
-                val cuestionario = cuestionarios.find {
-                    it.id == cuestionarioSeleccionadoParaEditarId
-                }
-
-                if (cuestionario != null) {
-
-                    EditarCuestionario(
-                        cuestionario = cuestionario,
-
-                        onVolver = {
-                            navController.popBackStack()
-                        },
-
-                        onEditado = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
             }
 
             composable(
                 route = "realizarCuestionario",
 
-                // La pantalla entra desde la derecha.
                 enterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { ancho ->
@@ -390,7 +595,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // La pantalla actual sale hacia la izquierda.
                 exitTransition = {
                     slideOutHorizontally(
                         targetOffsetX = { ancho ->
@@ -399,7 +603,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // Al volver, RealizarCuestionario entra desde la izquierda.
                 popEnterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { ancho ->
@@ -408,7 +611,6 @@ private fun ContenidoPrincipalApp() {
                     )
                 },
 
-                // Al volver, la pantalla sale hacia la derecha.
                 popExitTransition = {
                     slideOutHorizontally(
                         targetOffsetX = { ancho ->
@@ -433,4 +635,19 @@ private fun ContenidoPrincipalApp() {
             }
         }
     }
+
+
 }
+
+private fun <VM : ViewModel> fabricaViewModel(
+    crear: () -> VM
+): ViewModelProvider.Factory =
+    object : ViewModelProvider.Factory {
+
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(
+            modelClass: Class<T>
+        ): T = crear() as T
+    }
+

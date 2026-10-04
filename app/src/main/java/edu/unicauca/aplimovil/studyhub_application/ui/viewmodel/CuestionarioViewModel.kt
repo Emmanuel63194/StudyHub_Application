@@ -14,19 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel de Cuestionarios de StudyHub.
- *
- * Mantiene el cuestionario en creación o edición (título y preguntas),
- * valida su contenido y lo guarda en Room. También expone la lista de
- * cuestionarios guardados para la pantalla principal.
- */
 class CuestionarioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val cuestionarioDao =
         BaseDatosStudyHub.obtenerInstancia(application).cuestionarioDao()
-
-    // ---------- Lista de cuestionarios guardados ----------
 
     val cuestionarios: StateFlow<List<CuestionarioEntity>> =
         cuestionarioDao.obtenerTodos()
@@ -42,23 +33,15 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    // ---------- Cuestionario en creación o edición ----------
-
     private val _titulo = MutableStateFlow("")
     val titulo: StateFlow<String> = _titulo.asStateFlow()
 
-    // Siempre inicia con una pregunta:
-    // el cuestionario nunca queda sin preguntas.
     private val _preguntas =
         MutableStateFlow(listOf(crearPreguntaVacia()))
 
     val preguntas: StateFlow<List<PreguntaCuestionario>> =
         _preguntas.asStateFlow()
 
-    /**
-     * Pasa a true al pulsar "Crear" o "Editar";
-     * a partir de ahí se muestran los errores.
-     */
     private val _intentoCrear = MutableStateFlow(false)
 
     val intentoCrear: StateFlow<Boolean> =
@@ -68,7 +51,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         _titulo.value = nuevoTitulo
     }
 
-    /** Pregunta nueva: vacía y con 3 respuestas iniciales. */
     fun crearPreguntaVacia(): PreguntaCuestionario =
         PreguntaCuestionario(
             texto = "",
@@ -80,13 +62,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
             }
         )
 
-    /**
-     * Carga un cuestionario existente en los campos del ViewModel
-     * para poder editarlo.
-     *
-     * El título, las preguntas, las respuestas y la opción correcta
-     * se mantienen exactamente como están almacenados.
-     */
     fun cargarCuestionarioParaEditar(
         cuestionario: CuestionarioEntity
     ) {
@@ -100,7 +75,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
             _preguntas.value + crearPreguntaVacia()
     }
 
-    /** La primera pregunta (índice 0) no se puede eliminar. */
     fun eliminarPregunta(indice: Int) {
         if (indice < 1 || indice >= _preguntas.value.size) return
 
@@ -137,7 +111,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    /** Deja únicamente la respuesta indicada como correcta. */
     fun marcarRespuestaCorrecta(
         indicePregunta: Int,
         indiceRespuesta: Int
@@ -153,10 +126,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    /**
-     * Solo se puede eliminar la tercera respuesta;
-     * nunca quedan menos de 2.
-     */
     fun eliminarRespuesta(
         indicePregunta: Int,
         indiceRespuesta: Int
@@ -189,20 +158,9 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
             }
     }
 
-    // ---------- Validación ----------
-
-    /** El título es obligatorio. */
     fun tituloEsValido(): Boolean =
         _titulo.value.isNotBlank()
 
-    /**
-     * Mensaje de error de una pregunta, o null si es válida.
-     *
-     * Una pregunta necesita:
-     * - texto
-     * - al menos 2 respuestas con texto
-     * - una respuesta correcta que tenga texto
-     */
     fun mensajeErrorPregunta(
         pregunta: PreguntaCuestionario
     ): String? {
@@ -264,11 +222,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
     ): Boolean =
         mensajeErrorPregunta(pregunta) == null
 
-    // ---------- Creación ----------
-
-    /**
-     * Valida todo; si es correcto guarda y avisa mediante [onGuardado].
-     */
     fun intentarCrear(
         onGuardado: (Long) -> Unit = {}
     ) {
@@ -276,14 +229,6 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         guardarCuestionario(onGuardado)
     }
 
-    /**
-     * Inserta el cuestionario en Room y devuelve su id mediante
-     * [onGuardado].
-     *
-     * No hace nada si el título está vacío o alguna pregunta no es válida.
-     *
-     * La tercera respuesta, si quedó vacía, no se guarda.
-     */
     fun guardarCuestionario(
         onGuardado: (Long) -> Unit = {}
     ) {
@@ -326,14 +271,53 @@ class CuestionarioViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    // ---------- Edición ----------
+    fun guardarCuestionarioGenerado(
+        titulo: String,
+        preguntas: List<PreguntaCuestionario>,
+        onGuardado: (Long) -> Unit = {}
+    ) {
+        val tituloLimpio = titulo.trim()
 
-    /**
-     * Actualiza un cuestionario existente.
-     *
-     * Mantiene el mismo id del cuestionario y reemplaza únicamente
-     * su título y sus preguntas con los datos editados.
-     */
+        if (tituloLimpio.isBlank()) return
+        if (preguntas.isEmpty()) return
+
+        if (!preguntas.all {
+                preguntaEsValida(it)
+            }
+        ) {
+            return
+        }
+
+        val preguntasLimpias =
+            preguntas.map { pregunta ->
+
+                PreguntaCuestionario(
+                    texto = pregunta.texto.trim(),
+                    respuestas = pregunta.respuestas
+                        .filter {
+                            it.texto.isNotBlank()
+                        }
+                        .map {
+                            it.copy(
+                                texto = it.texto.trim()
+                            )
+                        }
+                )
+            }
+
+        viewModelScope.launch {
+
+            val id = cuestionarioDao.insertar(
+                CuestionarioEntity(
+                    titulo = tituloLimpio,
+                    preguntas = preguntasLimpias
+                )
+            )
+
+            onGuardado(id)
+        }
+    }
+
     fun editarCuestionario(
         cuestionario: CuestionarioEntity,
         onGuardado: () -> Unit = {}

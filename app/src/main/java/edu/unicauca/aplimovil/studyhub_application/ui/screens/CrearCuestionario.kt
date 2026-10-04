@@ -22,8 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.unicauca.aplimovil.studyhub_application.R
+import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CuestionarioEntity
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.PreguntaCuestionario
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.RespuestaCuestionario
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
@@ -51,22 +54,22 @@ internal val ColorAcento = Color(0xFFACC6FF)
 internal val ColorTextoSecundario = Color(0xFF989898)
 private val ColorError = Color(0xFFFF3B47)
 
-/**
- * Pantalla para crear un cuestionario: nombre y una o más preguntas,
- * cada una con 2 o 3 respuestas y una respuesta correcta.
- *
- * @param onVolver se llama al pulsar la flecha de regreso.
- * @param onCreado se llama cuando el cuestionario ya fue guardado.
- */
 @Composable
 fun CrearCuestionario(
     onVolver: () -> Unit,
     onCreado: () -> Unit,
+    cuestionarioAEditar: CuestionarioEntity? = null,
     viewModel: CuestionarioViewModel = viewModel()
 ) {
     val titulo by viewModel.titulo.collectAsState()
     val preguntas by viewModel.preguntas.collectAsState()
     val intentoCrear by viewModel.intentoCrear.collectAsState()
+
+    LaunchedEffect(cuestionarioAEditar?.id) {
+        cuestionarioAEditar?.let {
+            viewModel.cargarCuestionarioParaEditar(it)
+        }
+    }
 
     ContenidoCrearCuestionario(
         titulo = titulo,
@@ -107,19 +110,23 @@ fun CrearCuestionario(
         },
         onVolver = onVolver,
         onCrear = {
-            viewModel.intentarCrear {
-                onCreado()
+            if (cuestionarioAEditar == null) {
+                viewModel.intentarCrear {
+                    onCreado()
+                }
+            } else {
+                viewModel.editarCuestionario(
+                    cuestionario = cuestionarioAEditar,
+                    onGuardado = {
+                        onCreado()
+                    }
+                )
             }
-        }
+        },
+        modoEdicion = cuestionarioAEditar != null
     )
 }
 
-/**
- * Contenido visual de CrearCuestionario.
- *
- * Esta parte no depende directamente del ViewModel, por lo que también
- * puede utilizarse en el Preview con datos de prueba.
- */
 @Composable
 private fun ContenidoCrearCuestionario(
     titulo: String,
@@ -134,19 +141,21 @@ private fun ContenidoCrearCuestionario(
     alEliminarRespuesta: (Int, Int) -> Unit,
     alAgregarPregunta: () -> Unit,
     onVolver: () -> Unit,
-    onCrear: () -> Unit
+    onCrear: () -> Unit,
+    modoEdicion: Boolean = false
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorFondo)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .imePadding()
     ) {
-        // La barra queda fuera del scroll, así siempre es visible.
+
         BarraSuperiorCrear(
             onVolver = onVolver,
-            onCrear = onCrear
+            onCrear = onCrear,
+            modoEdicion = modoEdicion
         )
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -176,8 +185,6 @@ private fun ContenidoCrearCuestionario(
                 alCambiar = alCambiarTitulo,
                 placeholder = "Añadir nombre"
             )
-
-            // ----- Preguntas -----
 
             Spacer(modifier = Modifier.height(2.dp))
 
@@ -221,7 +228,6 @@ private fun ContenidoCrearCuestionario(
                     }
                 )
 
-                // Espacio entre bloques de preguntas
                 if (indicePregunta < preguntas.lastIndex) {
                     Spacer(
                         modifier = Modifier.height(10.dp)
@@ -229,7 +235,6 @@ private fun ContenidoCrearCuestionario(
                 }
             }
 
-            // ----- Agregar pregunta -----
 
             Box(
                 modifier = Modifier
@@ -259,7 +264,8 @@ private fun ContenidoCrearCuestionario(
 @Composable
 private fun BarraSuperiorCrear(
     onVolver: () -> Unit,
-    onCrear: () -> Unit
+    onCrear: () -> Unit,
+    modoEdicion: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -288,7 +294,7 @@ private fun BarraSuperiorCrear(
         )
 
         Text(
-            text = "Crear cuestionario",
+            text = if (modoEdicion) "Editar cuestionario" else "Crear cuestionario",
             color = Color.White,
             fontSize = 23.sp,
             modifier = Modifier.weight(1f),
@@ -311,7 +317,7 @@ private fun BarraSuperiorCrear(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Crear",
+                text = if (modoEdicion) "Editar" else "Crear",
                 color = Color.Black,
                 style = TipografiaStudyHub.ResaltadoTarjeta
             )
@@ -319,10 +325,6 @@ private fun BarraSuperiorCrear(
     }
 }
 
-/**
- * Etiqueta con un mensaje de error rojo a su derecha y,
- * opcionalmente, un ícono al final.
- */
 @Composable
 private fun EncabezadoConError(
     titulo: String,
@@ -374,7 +376,7 @@ private fun BloquePregunta(
             titulo = "Pregunta ${indice + 1}",
             error = error
         ) {
-            // La primera pregunta no se puede eliminar.
+
             if (indice > 0) {
                 IconoAccion(
                     recurso = R.drawable.eliminar_icono,
@@ -418,7 +420,6 @@ private fun BloquePregunta(
                     }
                 )
 
-                // Solo la tercera respuesta se puede eliminar.
                 if (
                     pregunta.respuestas.size == 3 &&
                     indiceRespuesta == 2
@@ -464,10 +465,6 @@ private fun IconoAccion(
     )
 }
 
-/**
- * Campo de texto redondeado de 67 dp con placeholder
- * y contenido opcional al final.
- */
 @Composable
 private fun CampoTextoCuestionario(
     valor: String,
@@ -482,7 +479,7 @@ private fun CampoTextoCuestionario(
             .clip(
                 RoundedCornerShape(16.dp)
             )
-            .background(ColorSuperficie)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -515,13 +512,6 @@ private fun CampoTextoCuestionario(
     }
 }
 
-/**
- * Preview visual de CrearCuestionario.
- *
- * No utiliza CuestionarioViewModel ni Room.
- * Los datos son únicamente de prueba para poder organizar
- * la interfaz visual.
- */
 @Preview(
     showBackground = true,
     backgroundColor = 0xFF191919,

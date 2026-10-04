@@ -6,10 +6,6 @@ import edu.unicauca.aplimovil.studyhub_application.data.local.entity.RespuestaCu
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * Convierte la lista de preguntas (con sus respuestas) a JSON y viceversa,
- * para poder guardarla en una sola columna de Room.
- */
 class Converters {
 
     @TypeConverter
