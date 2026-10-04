@@ -1,11 +1,20 @@
 package edu.unicauca.aplimovil.studyhub_application.ui.screens
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +49,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.unicauca.aplimovil.studyhub_application.R
+import edu.unicauca.aplimovil.studyhub_application.data.local.entity.CalendarioEntity
+import edu.unicauca.aplimovil.studyhub_application.ui.components.EliminarRecurso
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoFlecha
 import edu.unicauca.aplimovil.studyhub_application.ui.components.IconoHamburguesa
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
@@ -45,7 +59,7 @@ import java.util.Calendar
 
 private val DiasSemana = listOf("D", "L", "Ma", "Mi", "J", "V", "S")
 
-private val NombresMeses = listOf(
+internal val NombresMeses = listOf(
     "Enero",
     "Febrero",
     "Marzo",
@@ -63,6 +77,8 @@ private val NombresMeses = listOf(
 private const val AnioMinimo = 2000
 private const val AnioMaximo = 2200
 
+private val TamanoIndicadorEvento = 10.dp
+
 private data class FechaSeleccionada(
     val anio: Int,
     val mes: Int,
@@ -70,26 +86,17 @@ private data class FechaSeleccionada(
 )
 
 @Composable
-fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
+fun PantallaCalendario(
+    onMenuClick: () -> Unit = {},
+    eventos: List<CalendarioEntity> = emptyList(),
+    onGuardarEvento: (CalendarioEntity) -> Unit = {},
+    onEliminarEvento: (CalendarioEntity) -> Unit = {}
+) {
 
-    /*
-     * Obtenemos la fecha actual del dispositivo.
-     *
-     * Calendar usa los meses desde 0 hasta 11:
-     * Enero = 0
-     * Febrero = 1
-     * ...
-     * Septiembre = 8
-     * ...
-     * Diciembre = 11
-     */
     val hoy = remember {
         Calendar.getInstance()
     }
 
-    /*
-     * El calendario se abre inicialmente en el mes actual.
-     */
     var indiceMes by remember {
         mutableStateOf(
             (hoy.get(Calendar.YEAR) - AnioMinimo) * 12 +
@@ -97,12 +104,6 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
         )
     }
 
-    /*
-     * El día seleccionado comienza siendo el día de hoy.
-     *
-     * Por ejemplo:
-     * 28 de septiembre de 2026
-     */
     var fechaSeleccionada by remember {
         mutableStateOf(
             FechaSeleccionada(
@@ -113,68 +114,162 @@ fun PantallaCalendario(onMenuClick: () -> Unit = {}) {
         )
     }
 
-    /*
-     * Convertimos el índice en año y mes.
-     */
+    var mostrarNuevoEvento by remember { mutableStateOf(false) }
+    var eventoEnEdicion by remember { mutableStateOf<CalendarioEntity?>(null) }
+
+    var eventoPorEliminar by remember { mutableStateOf<CalendarioEntity?>(null) }
+
+    val diasConEventos = remember(eventos) {
+        eventos.map { it.fecha }.toSet()
+    }
+
+    val eventosDelDia = remember(eventos, fechaSeleccionada) {
+        val fechaElegida = fechaAMillis(
+            fechaSeleccionada.anio,
+            fechaSeleccionada.mes,
+            fechaSeleccionada.dia
+        )
+        eventos.filter { evento -> evento.fecha == fechaElegida }
+    }
+
     val anioActual = AnioMinimo + indiceMes / 12
     val mesActual = indiceMes % 12
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-    ) {
+    BackHandler(enabled = mostrarNuevoEvento) {
+        mostrarNuevoEvento = false
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .statusBarsPadding()
         ) {
-            BarraSuperiorCalendario(
-                onMenuClick = onMenuClick
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+            ) {
+                BarraSuperiorCalendario(
+                    onMenuClick = onMenuClick
+                )
+            }
+
+            ContenedorCalendario(
+                anio = anioActual,
+                mes = mesActual,
+                fechaSeleccionada = fechaSeleccionada,
+                diasConEventos = diasConEventos,
+                puedeRetroceder = indiceMes > 0,
+                puedeAvanzar = indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1),
+                onMesAnterior = {
+                    if (indiceMes > 0) {
+                        indiceMes--
+                    }
+                },
+                onMesSiguiente = {
+                    if (indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1)) {
+                        indiceMes++
+                    }
+                },
+                onDiaSeleccionado = { dia ->
+                    fechaSeleccionada = FechaSeleccionada(
+                        anio = anioActual,
+                        mes = mesActual,
+                        dia = dia
+                    )
+                }
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 20.dp)
+            ) {
+
+                if (eventosDelDia.isEmpty()) {
+
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    EstadoVacioEventos()
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                } else {
+
+                    ListaEventos(
+                        eventos = eventosDelDia,
+                        onEditar = { evento ->
+                            eventoEnEdicion = evento
+                            mostrarNuevoEvento = true
+                        },
+                        onEliminar = { evento ->
+                            // Primero se pide confirmación.
+                            eventoPorEliminar = evento
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                SeccionAccionCalendario(
+                    onAgregarClick = {
+                        eventoEnEdicion = null
+                        mostrarNuevoEvento = true
+                    }
+                )
+            }
+        }
+
+        eventoPorEliminar?.let { evento ->
+            EliminarRecurso(
+                titulo = "¿Quieres eliminarlo?",
+                descripcion = "Eliminarás el evento seleccionado.",
+                onCancelar = { eventoPorEliminar = null },
+                onEliminar = {
+                    onEliminarEvento(evento)
+                    eventoPorEliminar = null
+                }
             )
         }
 
-        ContenedorCalendario(
-            anio = anioActual,
-            mes = mesActual,
-            fechaSeleccionada = fechaSeleccionada,
-            puedeRetroceder = indiceMes > 0,
-            puedeAvanzar = indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1),
-            onMesAnterior = {
-                if (indiceMes > 0) {
-                    indiceMes--
-                }
-            },
-            onMesSiguiente = {
-                if (indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1)) {
-                    indiceMes++
-                }
-            },
-            onDiaSeleccionado = { dia ->
-                fechaSeleccionada = FechaSeleccionada(
-                    anio = anioActual,
-                    mes = mesActual,
-                    dia = dia
-                )
-            }
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 20.dp)
+        AnimatedVisibility(
+            visible = mostrarNuevoEvento,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300))
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { mostrarNuevoEvento = false }
+                    )
+            )
+        }
 
-            Spacer(modifier = Modifier.height(48.dp))
-
-            EstadoVacioEventos()
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            SeccionAccionCalendario()
+        AnimatedVisibility(
+            visible = mostrarNuevoEvento,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically(
+                animationSpec = tween(300),
+                initialOffsetY = { alto -> alto }
+            ),
+            exit = slideOutVertically(
+                animationSpec = tween(300),
+                targetOffsetY = { alto -> alto }
+            )
+        ) {
+            NuevoEvento(
+                eventoAEditar = eventoEnEdicion,
+                onCerrar = { mostrarNuevoEvento = false },
+                onGuardar = onGuardarEvento
+            )
         }
     }
 }
@@ -209,6 +304,7 @@ private fun ContenedorCalendario(
     anio: Int,
     mes: Int,
     fechaSeleccionada: FechaSeleccionada,
+    diasConEventos: Set<Long>,
     puedeRetroceder: Boolean,
     puedeAvanzar: Boolean,
     onMesAnterior: () -> Unit,
@@ -249,6 +345,7 @@ private fun ContenedorCalendario(
                 anio = anio,
                 mes = mes,
                 fechaSeleccionada = fechaSeleccionada,
+                diasConEventos = diasConEventos,
                 onDiaSeleccionado = onDiaSeleccionado
             )
         }
@@ -325,6 +422,7 @@ private fun FilaDeDias(
     anio: Int,
     mes: Int,
     fechaSeleccionada: FechaSeleccionada,
+    diasConEventos: Set<Long>,
     onDiaSeleccionado: (Int) -> Unit
 ) {
 
@@ -353,6 +451,16 @@ private fun FilaDeDias(
                             onDiaSeleccionado(dia)
                         }
                     )
+
+                    if (fechaAMillis(anio, mes, dia) in diasConEventos) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = 8.dp)
+                                .size(TamanoIndicadorEvento)
+                                .background(ColorRojoEvento)
+                        )
+                    }
                 }
             }
         }
@@ -374,7 +482,7 @@ private fun CeldaDia(
                 if (estaSeleccionado) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    androidx.compose.ui.graphics.Color.Transparent
+                    Color.Transparent
                 }
             )
             .clickable(onClick = onClick),
@@ -405,25 +513,6 @@ private fun obtenerSemanasDelMes(
         set(Calendar.DAY_OF_MONTH, 1)
     }
 
-    /*
-     * Calendar.DAY_OF_WEEK:
-     *
-     * Domingo = 1
-     * Lunes = 2
-     * Martes = 3
-     * Miércoles = 4
-     * Jueves = 5
-     * Viernes = 6
-     * Sábado = 7
-     *
-     * Como nuestro calendario empieza en domingo,
-     * restamos Calendar.SUNDAY para obtener:
-     *
-     * Domingo = 0
-     * Lunes = 1
-     * ...
-     * Sábado = 6
-     */
     val posicionPrimerDia =
         calendario.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
 
@@ -434,16 +523,10 @@ private fun obtenerSemanasDelMes(
 
     var semanaActual = mutableListOf<Int?>()
 
-    /*
-     * Espacios antes del primer día del mes.
-     */
     repeat(posicionPrimerDia) {
         semanaActual.add(null)
     }
 
-    /*
-     * Agregamos todos los días del mes.
-     */
     for (dia in 1..cantidadDias) {
 
         semanaActual.add(dia)
@@ -456,10 +539,6 @@ private fun obtenerSemanasDelMes(
         }
     }
 
-    /*
-     * Completamos la última semana con espacios
-     * hasta llegar a 7 columnas.
-     */
     if (semanaActual.isNotEmpty()) {
 
         while (semanaActual.size < 7) {
@@ -503,7 +582,123 @@ private fun EstadoVacioEventos() {
 }
 
 @Composable
-private fun SeccionAccionCalendario() {
+private fun ListaEventos(
+    eventos: List<CalendarioEntity>,
+    onEditar: (CalendarioEntity) -> Unit,
+    onEliminar: (CalendarioEntity) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+
+        contentPadding = PaddingValues(bottom = 90.dp)
+    ) {
+
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+            LineaDivisoriaEvento()
+        }
+
+        items(
+            items = eventos,
+            key = { evento -> evento.id }
+        ) { evento ->
+            ItemEvento(
+                evento = evento,
+                onEditar = { onEditar(evento) },
+                onEliminar = { onEliminar(evento) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ItemEvento(
+    evento: CalendarioEntity,
+    onEditar: () -> Unit,
+    onEliminar: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = formatearFechaHoraEvento(evento),
+                color = ColorTextoSecundarioEvento,
+                fontSize = 15.sp,
+                maxLines = 1
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.editar_icono),
+                contentDescription = "Editar evento",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable(onClick = onEditar)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.eliminar_icono),
+                contentDescription = "Eliminar evento",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable(onClick = onEliminar)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        val tieneNota = evento.nota.isNotBlank()
+
+        Text(
+            text = evento.titulo,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+
+                .padding(top = 6.dp, bottom = if (tieneNota) 0.dp else 12.dp)
+        )
+
+        if (tieneNota) {
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = evento.nota,
+                color = ColorTextoSecundarioEvento,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp, bottom = 12.dp)
+            )
+        }
+
+        LineaDivisoriaEvento()
+    }
+}
+
+@Composable
+private fun SeccionAccionCalendario(
+    onAgregarClick: () -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -512,18 +707,21 @@ private fun SeccionAccionCalendario() {
         horizontalArrangement = Arrangement.End
     ) {
 
-        BotonAgregarCalendario()
+        BotonAgregarCalendario(onClick = onAgregarClick)
     }
 }
 
 @Composable
-private fun BotonAgregarCalendario() {
+private fun BotonAgregarCalendario(
+    onClick: () -> Unit
+) {
 
     Box(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.primary),
+            .background(MaterialTheme.colorScheme.primary)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
 
@@ -550,4 +748,3 @@ fun PantallaCalendarioPreview() {
         PantallaCalendario()
     }
 }
-
