@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,10 @@ import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
 @Composable
-fun TarjetaResumen(modifier: Modifier = Modifier) {
+fun TarjetaResumen(
+    modifier: Modifier = Modifier,
+    contenidoEventos: (@Composable ColumnScope.() -> Unit)? = null
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -51,24 +55,31 @@ fun TarjetaResumen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.hombre_jardin),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            contentScale = ContentScale.Fit
-        )
+        if (contenidoEventos == null) {
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Image(
+                painter = painterResource(id = R.drawable.hombre_jardin),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentScale = ContentScale.Fit
+            )
 
-        Text(
-            text = "No hay trabajos o examenes por realizar en el momento.",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = TipografiaStudyHub.MensajeEstadoVacio,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "No hay trabajos o examenes por realizar en el momento.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = TipografiaStudyHub.MensajeEstadoVacio,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+        } else {
+
+            contenidoEventos()
+        }
     }
 }
 

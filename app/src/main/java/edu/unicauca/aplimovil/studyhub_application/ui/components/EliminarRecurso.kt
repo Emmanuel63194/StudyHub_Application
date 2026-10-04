@@ -37,12 +37,6 @@ private val ColorBotonCancelar = Color(0xFF0F0F0F)
 private val ColorBotonEliminar = Color(0xFFACC6FF)
 private val ColorTextoSecundario = Color(0xFF989898)
 
-/**
- * Modal genérico de confirmación de eliminación.
- *
- * No sabe qué recurso se elimina: solo muestra la confirmación y
- * avisa la acción elegida mediante [onCancelar] y [onEliminar].
- */
 @Composable
 fun EliminarRecurso(
     onCancelar: () -> Unit,
@@ -58,7 +52,6 @@ fun EliminarRecurso(
         )
     ) {
 
-        // Oscurece la pantalla de atrás.
         val ventana =
             (LocalView.current.parent as? DialogWindowProvider)?.window
 
