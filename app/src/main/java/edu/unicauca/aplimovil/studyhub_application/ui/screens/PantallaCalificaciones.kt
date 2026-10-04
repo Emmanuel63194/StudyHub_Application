@@ -67,40 +67,49 @@ fun PantallaCalificaciones(
         mutableStateOf<CalificacionEntity?>(null)
     }
 
-    val visibles = calificaciones.filter {
-        cumpleFiltroCalificacion(it.fecha, filtro)
+    val visibles = calificaciones.filter { calificacion ->
+        cumpleFiltroCalificacion(calificacion.fecha, filtro) &&
+                asignaturas.any { asignatura ->
+                    asignatura.id == calificacion.asignaturaId
+                }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .padding(20.dp)
     ) {
-        BarraSuperiorCalificaciones(
-            onMenuClick = onMenuClick
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-        if (visibles.isEmpty()) {
-            EstadoVacioCalificaciones(
-                modifier = Modifier.weight(1f)
+            BarraSuperiorCalificaciones(
+                onMenuClick = onMenuClick
             )
-        } else {
-            ListaCalificaciones(
-                asignaturas = asignaturas,
-                visibles = visibles,
-                onEditar = onEditarClick,
-                onEliminar = {
-                    calificacionAEliminar = it
-                },
-                modifier = Modifier.weight(1f)
-            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (visibles.isEmpty()) {
+                EstadoVacioCalificaciones(
+                    modifier = Modifier
+                        .weight(1f)
+                        .offset(y = (-80).dp)
+                )
+            } else {
+                ListaCalificaciones(
+                    asignaturas = asignaturas,
+                    visibles = visibles,
+                    onEditar = onEditarClick,
+                    onEliminar = {
+                        calificacionAEliminar = it
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
 
         FilaFiltroYBoton(
             filtro = filtro,
@@ -108,7 +117,9 @@ fun PantallaCalificaciones(
                 filtro = it
             },
             onAgregarClick = onAgregarClick,
-            modifier = Modifier.offset(y = (-36).dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-36).dp)
         )
     }
 

@@ -103,7 +103,8 @@ private fun ContenidoPrincipalApp() {
     val asignaturaViewModel: AsignaturaViewModel = viewModel(
         factory = fabricaViewModel {
             AsignaturaViewModel(
-                baseDatos.asignaturaDao()
+                baseDatos.asignaturaDao(),
+                baseDatos.calificacionDao()
             )
         }
     )
