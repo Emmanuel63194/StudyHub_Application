@@ -42,7 +42,7 @@ import edu.unicauca.aplimovil.studyhub_application.data.local.entity.PreguntaCue
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.RespuestaCuestionario
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-private val ColorIncorrecta = Color(0xFFE31C3F)
+private val ColorIncorrecta = Color.Red
 private val ColorCorrecta = Color(0xFF16B21F)
 
 @Composable
@@ -51,7 +51,7 @@ fun RealizarCuestionario(
     onVolver: () -> Unit,
     respuestasIniciales: Map<Int, Int> = emptyMap()
 ) {
-    if (cuestionario == null) {
+    if (cuestionario == null) { // aqui se define una pantalla de error cuando no se encuentra el cuestionario pero generalmente no sucede
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -84,9 +84,12 @@ fun RealizarCuestionario(
 
                 Box(
                     modifier = Modifier
-                        .size(width = 107.dp, height = 36.dp)
+                        .size(
+                            width = 107.dp,
+                            height = 36.dp
+                        )
                         .clip(RoundedCornerShape(20.dp))
-                        .background(ColorAcento)
+                        .background(MaterialTheme.colorScheme.primary)
                         .clickable(onClick = onVolver),
                     contentAlignment = Alignment.Center
                 ) {
@@ -102,19 +105,19 @@ fun RealizarCuestionario(
         return
     }
 
-    val seleccionadas = remember(cuestionario.id) {
+    val seleccionadas = remember(cuestionario.id) { // guarda la respuestas seleccionadas
         mutableStateMapOf<Int, Int>().apply {
             putAll(respuestasIniciales)
         }
     }
 
-    val preguntas = cuestionario.preguntas
+    val preguntas = cuestionario.preguntas // obtiene todas las preguntas
 
-    val total = preguntas.size
+    val total = preguntas.size // cuenta cuantas hay
 
-    val respondidas = seleccionadas.size
+    val respondidas = seleccionadas.size // cuenta cuantas ya tienen respuesta
 
-    val aciertos = seleccionadas.count { (indicePregunta, indiceRespuesta) ->
+    val aciertos = seleccionadas.count { (indicePregunta, indiceRespuesta) -> // determina cuantas son correctas
         preguntas
             .getOrNull(indicePregunta)
             ?.respuestas
@@ -122,7 +125,7 @@ fun RealizarCuestionario(
             ?.esCorrecta == true
     }
 
-    val terminado = total > 0 && respondidas == total
+    val terminado = total > 0 && respondidas == total // determina si todas las preguntas fueron respondidas
 
     Column(
         modifier = Modifier
@@ -137,7 +140,7 @@ fun RealizarCuestionario(
             style = TipografiaStudyHub.TituloSeccion
         )
 
-        if (preguntas.isEmpty()) {
+        if (preguntas.isEmpty()) { // comprueba si el cuestionario no tiene ninguna respuesta
 
             Column(
                 modifier = Modifier
@@ -156,53 +159,53 @@ fun RealizarCuestionario(
 
         } else {
 
-            LazyColumn(
+            LazyColumn( // muestra lista de preguntas que se pueden deslizar verticalmente
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .navigationBarsPadding(),
 
-                contentPadding = PaddingValues(
+                contentPadding = PaddingValues( // agrega espacio alrededor del contenido de la lista
                     start = 16.dp,
                     end = 16.dp,
                     bottom = 24.dp
                 )
             ) {
 
-                item {
+                item { // agrega espacio antes de mostrar la primera pregunta
                     Spacer(
                         modifier = Modifier.height(20.dp)
                     )
                 }
 
-                itemsIndexed(
+                itemsIndexed( // recorre todas las preguntas y muestra una por una
                     preguntas
                 ) { indicePregunta, pregunta ->
 
-                    BloquePreguntaRealizar(
+                    BloquePreguntaRealizar( // muestra la pregunta y sus respuesta
                         indice = indicePregunta,
                         pregunta = pregunta,
                         elegida = seleccionadas[indicePregunta],
 
-                        alElegir = { indiceRespuesta ->
+                        alElegir = { indiceRespuesta -> // se jecuta cuando se selecciona una respuesta
 
-                            if (!seleccionadas.containsKey(indicePregunta)) {
+                            if (!seleccionadas.containsKey(indicePregunta)) { // evita que el usuario pueda cambiar su respuesta despues de elegirla
                                 seleccionadas[indicePregunta] =
                                     indiceRespuesta
                             }
                         }
                     )
 
-                    if (indicePregunta < preguntas.lastIndex) {
+                    if (indicePregunta < preguntas.lastIndex) { // agrega una espacio entra la pregunta y la seguiente
                         Spacer(
                             modifier = Modifier.height(40.dp)
                         )
                     }
                 }
 
-                if (terminado) {
+                if (terminado) { // comprueba si todas ya fueron respondidas
 
-                    item(
+                    item( // muestra los aciertos y el boton para reiniciarlo
                         key = "resultado"
                     ) {
                         ResultadoFinal(
@@ -220,7 +223,7 @@ fun RealizarCuestionario(
 }
 
 @Composable
-private fun BarraSuperiorRealizar(
+private fun BarraSuperiorRealizar( // este para es crer la barra superior del cuestionario
     titulo: String,
     onVolver: () -> Unit,
     style: TextStyle
@@ -264,7 +267,7 @@ private fun BarraSuperiorRealizar(
 }
 
 @Composable
-private fun BloquePreguntaRealizar(
+private fun BloquePreguntaRealizar( // se muestra la pregunta del cuestionario junto con sus respuestas
     indice: Int,
     pregunta: PreguntaCuestionario,
     elegida: Int?,
@@ -274,7 +277,7 @@ private fun BloquePreguntaRealizar(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        Text(
+        Text( // para ver el numero de la pregunta
             text = "Pregunta ${indice + 1}",
             color = Color.White,
             fontSize = 20.sp,
@@ -286,14 +289,14 @@ private fun BloquePreguntaRealizar(
             fondo = MaterialTheme.colorScheme.surfaceContainer
         )
 
-        pregunta.respuestas.forEachIndexed { indiceRespuesta, respuesta ->
+        pregunta.respuestas.forEachIndexed { indiceRespuesta, respuesta -> // recorre todas las respuestas de la pregunta
 
             val respondida = elegida != null
 
             val esLaElegida =
                 elegida == indiceRespuesta
 
-            val fondo = when {
+            val fondo = when { //determina el color de la respuesta
                 esLaElegida && respuesta.esCorrecta ->
                     ColorCorrecta
 
@@ -304,7 +307,7 @@ private fun BloquePreguntaRealizar(
                     MaterialTheme.colorScheme.surfaceContainer
             }
 
-            val mostrarCheck =
+            val mostrarCheck = // determina si se debe mostrar el check en la respuesta correcta
                 respondida &&
                         !esLaElegida &&
                         respuesta.esCorrecta &&
@@ -312,16 +315,16 @@ private fun BloquePreguntaRealizar(
                             .getOrNull(elegida!!)
                             ?.esCorrecta != true
 
-            ContenedorTexto(
+            ContenedorTexto( // muestra cada respuesta y controla si puede ser seleccionada
                 texto = respuesta.texto,
                 fondo = fondo,
                 mostrarCheck = mostrarCheck,
 
-                onClick = if (respondida) {
+                onClick = if (respondida) { // si ya respondio no permite volver a seleccionar
                     null
                 } else {
                     {
-                        alElegir(indiceRespuesta)
+                        alElegir(indiceRespuesta) // aqui la guarda
                     }
                 }
             )
@@ -330,7 +333,7 @@ private fun BloquePreguntaRealizar(
 }
 
 @Composable
-private fun ContenedorTexto(
+private fun ContenedorTexto( // este contenedor es para mostrar el texto de la pregunta o respuesta
     texto: String,
     fondo: Color,
     mostrarCheck: Boolean = false,
@@ -342,7 +345,7 @@ private fun ContenedorTexto(
         .background(fondo)
 
     Row(
-        modifier = (
+        modifier = ( // aqui determinamos si ese contenedor puede ser interactivo
                 if (onClick != null) {
                     base.clickable(onClick = onClick)
                 } else {
@@ -363,7 +366,7 @@ private fun ContenedorTexto(
             modifier = Modifier.weight(1f)
         )
 
-        if (mostrarCheck) {
+        if (mostrarCheck) { // aqui es para comprobar si se debe mostrar el icono de la resppuesta correcta
 
             Icon(
                 painter = painterResource(
@@ -380,7 +383,7 @@ private fun ContenedorTexto(
 }
 
 @Composable
-private fun ResultadoFinal(
+private fun ResultadoFinal( // mostrar el resultado final del cuestionario y se permite reiniciarlo
     aciertos: Int,
     total: Int,
     onReiniciar: () -> Unit
@@ -409,7 +412,7 @@ private fun ResultadoFinal(
                     height = 36.dp
                 )
                 .clip(RoundedCornerShape(20.dp))
-                .background(ColorAcento)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onReiniciar),
 
             contentAlignment = Alignment.Center

@@ -45,7 +45,7 @@ fun ResumenEmergente(
     onCerrar: () -> Unit
 ) {
 
-    val alturaMaxima = (LocalConfiguration.current.screenHeightDp * 0.6f).dp
+    val alturaMaxima = (LocalConfiguration.current.screenHeightDp * 0.6f).dp // Calcula una altura máxima equivalente al 60 % de la pantalla.
 
     Column(
         modifier = Modifier

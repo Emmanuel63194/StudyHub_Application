@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +35,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import edu.unicauca.aplimovil.studyhub_application.BuildConfig
-import edu.unicauca.aplimovil.studyhub_application.R
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.PreguntaCuestionario
 import edu.unicauca.aplimovil.studyhub_application.data.local.entity.RespuestaCuestionario
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
@@ -60,40 +57,40 @@ fun CuestionarioRapido(
     onCerrar: () -> Unit = {},
     onCuestionarioGuardado: () -> Unit = {}
 ) {
-    var contenido by remember {
+    var contenido by remember { // guarda el cotnendo o el tema que escribe el usuario
         mutableStateOf("")
     }
 
-    var cantidadPreguntas by remember {
+    var cantidadPreguntas by remember { // guarda la cantidad de preguntas que escribe el usuario
         mutableStateOf("")
     }
 
-    var mostrarErrorContenido by remember {
+    var mostrarErrorContenido by remember { // controla si debe mostrar un error en el campo del contenido
         mutableStateOf(false)
     }
 
-    var mostrarErrorCantidad by remember {
+    var mostrarErrorCantidad by remember { // lo mismo aqui en cantidad
         mutableStateOf(false)
     }
 
-    var generando by remember {
+    var generando by remember { // indica si el cuestionario se esta generando
         mutableStateOf(false)
     }
 
-    val alcanceCorutinas = rememberCoroutineScope()
+    val alcanceCorutinas = rememberCoroutineScope() // ejecuto tareas que pueden tardar, en este caso a open router
 
-    Dialog(
-        onDismissRequest = {
+    Dialog( // creo la ventana de cuestionario rapido
+        onDismissRequest = { // solo se permite cerrar si no se esta generando el cuestionario
             if (!generando) {
                 onCerrar()
             }
         },
-        properties = DialogProperties(
+        properties = DialogProperties( // defino ancho permitido por el propio diseño
             usePlatformDefaultWidth = false
         )
     ) {
 
-        val ventana =
+        val ventana = // obtiene la ventana real del dialogo para modificar sus propiedades
             (LocalView.current.parent as? DialogWindowProvider)?.window
 
         SideEffect {
@@ -104,7 +101,7 @@ fun CuestionarioRapido(
             modifier = Modifier
                 .size(
                     width = 390.dp,
-                    height = 380.dp
+                    height = 355.dp
                 )
                 .background(
                     color = MaterialTheme.colorScheme.background,
@@ -117,28 +114,9 @@ fun CuestionarioRapido(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(42.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-
-                    Icon(
-                        painter = painterResource(
-                            id = R.drawable.cerrar_icono
-                        ),
-                        contentDescription = "Cerrar",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(30.dp)
-                            .clickable(
-                                enabled = !generando,
-                                onClick = onCerrar
-                            )
-                    )
-                }
+                Spacer(
+                    modifier = Modifier.height(18.dp)
+                )
 
                 Text(
                     text = "Cuestionario instantaneo",
@@ -180,7 +158,7 @@ fun CuestionarioRapido(
 
                 if (generando) {
 
-                    CircularProgressIndicator(
+                    CircularProgressIndicator( // muestra el indicador de carga mientras la IA genera el cuestionario
                         modifier = Modifier.size(30.dp),
                         color = Color(0xFFACC6FF),
                         strokeWidth = 3.dp
@@ -188,7 +166,7 @@ fun CuestionarioRapido(
 
                 } else {
 
-                    Box(
+                    Box( // crea el boton de generar
                         modifier = Modifier
                             .size(
                                 width = 107.dp,
@@ -209,29 +187,29 @@ fun CuestionarioRapido(
                                 val cantidad =
                                     cantidadPreguntas.toIntOrNull()
 
-                                if (
+                                if ( // contenido no este vacio
                                     contenido.isNotBlank() &&
                                     cantidad != null &&
                                     cantidad > 0
                                 ) {
 
                                     mostrarErrorCantidad = false
-                                    generando = true
+                                    generando = true // comienza la generacion del cuestionario
 
-                                    alcanceCorutinas.launch {
+                                    alcanceCorutinas.launch { // inicia la solicitud de la IA
 
-                                        val resultado =
+                                        val resultado = // enviamos contenido y cantidad de preguntas open router
                                             generarCuestionarioOpenRouter(
                                                 texto = contenido,
                                                 cantidadPreguntas = cantidad
                                             )
 
-                                        if (
+                                        if ( // comprueba que la IA haya devuelto un titulo y pregunta validas
                                             resultado.titulo != null &&
                                             resultado.preguntas != null
                                         ) {
 
-                                            viewModel.guardarCuestionarioGenerado(
+                                            viewModel.guardarCuestionarioGenerado( // guarda en la base de datos el cuestionario generado
                                                 titulo = resultado.titulo,
                                                 preguntas = resultado.preguntas
                                             ) {
@@ -302,9 +280,9 @@ private fun CampoContenidoTema(
                     if (texto.isEmpty()) {
 
                         Text(
-                            text = "Pegue aqui la informacion de los temas",
+                            text = "Digite el contenido del tema aqui",
                             color = Color(0xFF989898),
-                            fontSize = 20.sp
+                            fontSize = 18.sp
                         )
                     }
 
@@ -359,7 +337,7 @@ private fun CampoCantidadPreguntas(
                 value = texto,
                 onValueChange = {
 
-                    if (
+                    if ( // comprueba que todos los caracteres sean numeros
                         it.all { caracter ->
                             caracter.isDigit()
                         }
@@ -376,7 +354,7 @@ private fun CampoCantidadPreguntas(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
-                decorationBox = { campoTexto ->
+                decorationBox = { campoTexto -> // muestra el texto de ayuda cuando el campo este vacio
 
                     if (texto.isEmpty()) {
 
@@ -417,16 +395,16 @@ private suspend fun generarCuestionarioOpenRouter(
     texto: String,
     cantidadPreguntas: Int
 ): ResultadoCuestionarioGenerado =
-    withContext(Dispatchers.IO) {
+    withContext(Dispatchers.IO) { // ejecuta la conexion de red para operaciones de entrada y salida
 
-        var conexion: HttpURLConnection? = null
+        var conexion: HttpURLConnection? = null // guarda la conexion para utilizar y cerrarla posteriormente
 
         try {
 
             val apiKey =
-                BuildConfig.OPENROUTER_API_KEY
+                BuildConfig.OPENROUTER_API_KEY // obtenemos la API KEY
 
-            if (apiKey.isBlank()) {
+            if (apiKey.isBlank()) { // comprueba si no esta vacia
 
                 return@withContext ResultadoCuestionarioGenerado(
                     titulo = null,
@@ -436,22 +414,22 @@ private suspend fun generarCuestionarioOpenRouter(
             }
 
             val url = URL(
-                "https://openrouter.ai/api/v1/chat/completions"
+                "https://openrouter.ai/api/v1/chat/completions" // define la direccion de la API de open router que recibe las solicitudes
             )
 
             conexion =
-                url.openConnection() as HttpURLConnection
+                url.openConnection() as HttpURLConnection // abre conexion HTTP
 
             conexion.requestMethod = "POST"
             conexion.connectTimeout = 30000
             conexion.readTimeout = 120000
 
-            conexion.setRequestProperty(
+            conexion.setRequestProperty( // envio la API KEY
                 "Authorization",
                 "Bearer $apiKey"
             )
 
-            conexion.setRequestProperty(
+            conexion.setRequestProperty( // indica que datos se enviaran y que estaran en formato JSON
                 "Content-Type",
                 "application/json"
             )
@@ -510,26 +488,26 @@ private suspend fun generarCuestionarioOpenRouter(
                 $texto
             """.trimIndent()
 
-            val cuerpo = JSONObject().apply {
+            val cuerpo = JSONObject().apply { // construye el objeto JSON que se enviara a open router
 
-                put(
+                put( // indica que modelo de IA voy a utilizar
                     "model",
                     "poolside/laguna-s-2.1:free"
                 )
 
-                put(
+                put( // indica la lista de mensajes que va a recibir
                     "messages",
                     JSONArray().apply {
 
-                        put(
+                        put(  // agrega un mensaje enviado por el usuario
                             JSONObject().apply {
 
-                                put(
+                                put(  // indica que el mensaje le pertenece al usuario
                                     "role",
                                     "user"
                                 )
 
-                                put(
+                                put( // coloca las instrucciones creadas
                                     "content",
                                     instrucciones
                                 )
@@ -539,7 +517,7 @@ private suspend fun generarCuestionarioOpenRouter(
                 )
             }
 
-            conexion.outputStream.use { salida ->
+            conexion.outputStream.use { salida -> // enviamos el json a open router
 
                 salida.write(
                     cuerpo.toString().toByteArray(
@@ -548,15 +526,17 @@ private suspend fun generarCuestionarioOpenRouter(
                 )
             }
 
-            val codigoRespuesta =
+            val codigoRespuesta = // obtene codigo del HTTP que devolvio el servidor
                 conexion.responseCode
 
-            val flujo =
-                if (codigoRespuesta in 200..299) {
+            val flujo = // selecciona el flujo correcto segun el resultado de la solicitud
+                if (codigoRespuesta in 200..299) { // si fue exitoso la lee normal o si no lee el error
                     conexion.inputStream
                 } else {
                     conexion.errorStream
                 }
+
+            // lee todo el contenido
 
             val textoRespuesta =
                 flujo
@@ -566,9 +546,9 @@ private suspend fun generarCuestionarioOpenRouter(
                     }
                     ?: ""
 
-            if (codigoRespuesta !in 200..299) {
+            if (codigoRespuesta !in 200..299) { // comprueba si open router devolvio un codigo fuera del rango exitoso
 
-                return@withContext ResultadoCuestionarioGenerado(
+                return@withContext ResultadoCuestionarioGenerado( // devuelve error si intenta preocesar la respuesta como cuestionario
                     titulo = null,
                     preguntas = null,
                     mensaje = """
@@ -579,18 +559,18 @@ private suspend fun generarCuestionarioOpenRouter(
                 )
             }
 
-            val respuestaApi =
+            val respuestaApi = // convierte la respuesta completa de openrouter en un objeto JSON
                 JSONObject(textoRespuesta)
 
-            val choices =
+            val choices = // obtene la lista de choices de la respuesta de la API
                 respuestaApi.optJSONArray("choices")
 
-            if (
+            if ( // comprueba que si existe y que tenga al menos una respuesta
                 choices == null ||
                 choices.length() == 0
             ) {
 
-                return@withContext ResultadoCuestionarioGenerado(
+                return@withContext ResultadoCuestionarioGenerado( // devuelve error si el modelo no produjo ninguna respuesta
                     titulo = null,
                     preguntas = null,
                     mensaje = """
@@ -600,12 +580,12 @@ private suspend fun generarCuestionarioOpenRouter(
                 )
             }
 
-            val mensaje =
+            val mensaje = // obtiene el primer elemento de choices
                 choices
                     .getJSONObject(0)
                     .getJSONObject("message")
 
-            val contenido =
+            val contenido = // obtiene el texto generado por el modelo
                 mensaje
                     .optString(
                         "content",
@@ -613,9 +593,9 @@ private suspend fun generarCuestionarioOpenRouter(
                     )
                     .trim()
 
-            if (contenido.isBlank()) {
+            if (contenido.isBlank()) { // comprueba que la IA haya devuelto un conenido
 
-                return@withContext ResultadoCuestionarioGenerado(
+                return@withContext ResultadoCuestionarioGenerado( // devuelve error si la respuesta esta vacia
                     titulo = null,
                     preguntas = null,
                     mensaje = """
@@ -625,7 +605,7 @@ private suspend fun generarCuestionarioOpenRouter(
                 )
             }
 
-            procesarJSONCuestionario(
+            procesarJSONCuestionario( // envia el JSON generado por la IA a la funcion que lo interpreta
                 contenido = contenido,
                 cantidadEsperada = cantidadPreguntas
             )
@@ -648,26 +628,26 @@ private suspend fun generarCuestionarioOpenRouter(
         }
     }
 
-private fun procesarJSONCuestionario(
+private fun procesarJSONCuestionario( // vamos a procesar el JSON recibido por la IA y lo convierte a cuestionario
     contenido: String,
     cantidadEsperada: Int
 ): ResultadoCuestionarioGenerado {
 
-    return try {
+    return try { // intenta interpretar y valida el contenido recibido
 
-        val json =
+        val json = // convierte el texto recibido en un objeto json
             JSONObject(contenido)
 
-        val titulo =
+        val titulo = // obtiene el titulo generado por la IA
             json.optString(
                 "titulo",
                 ""
             ).trim()
 
-        val preguntasJson =
+        val preguntasJson = // obtiene la lista de preguntas del JSON
             json.optJSONArray("preguntas")
 
-        if (titulo.isBlank()) {
+        if (titulo.isBlank()) { // comprueba si la IA genero un titulo
 
             return ResultadoCuestionarioGenerado(
                 titulo = null,
@@ -678,7 +658,7 @@ private fun procesarJSONCuestionario(
             )
         }
 
-        if (preguntasJson == null) {
+        if (preguntasJson == null) { // lo mismo con preguntas
 
             return ResultadoCuestionarioGenerado(
                 titulo = null,
@@ -690,7 +670,7 @@ private fun procesarJSONCuestionario(
             )
         }
 
-        if (
+        if ( // comprueba la cantidad de pregunta sea exactamente la solicitada
             preguntasJson.length() != cantidadEsperada
         ) {
 
@@ -706,41 +686,41 @@ private fun procesarJSONCuestionario(
             )
         }
 
-        val preguntas =
+        val preguntas = // crea una lista donde se almacenaran las preguntas ya convertidas
             mutableListOf<PreguntaCuestionario>()
 
-        for (
+        for ( // recorre todas las preguntas recibidas
         indice in 0 until preguntasJson.length()
         ) {
 
-            val preguntaJson =
+            val preguntaJson = // obtiene la pregunta actual como objeto JSON
                 preguntasJson.getJSONObject(indice)
 
-            val textoPregunta =
+            val textoPregunta = // obtiene el texto de la pregunta
                 preguntaJson.optString(
                     "pregunta",
                     ""
                 ).trim()
 
-            val opciones =
+            val opciones = // optiene las opcionese de respuesta
                 preguntaJson.optJSONArray(
                     "opciones"
                 )
 
-            val respuestaCorrecta =
+            val respuestaCorrecta = // obtiene el indice de la respuesta correcta
                 preguntaJson.optInt(
                     "respuestaCorrecta",
                     -1
                 )
 
-            if (
+            if ( // comprueba que la pregunta tenga todos los campos necesarios
                 textoPregunta.isBlank() ||
                 opciones == null ||
                 opciones.length() != 3 ||
                 respuestaCorrecta !in 0..2
             ) {
 
-                return ResultadoCuestionarioGenerado(
+                return ResultadoCuestionarioGenerado( // devuelve error si la estrcutura de la pregunta no es valida
                     titulo = null,
                     preguntas = null,
                     mensaje = """
@@ -755,14 +735,14 @@ private fun procesarJSONCuestionario(
                 )
             }
 
-            val respuestas =
+            val respuestas = // crea una lista para almacenar las respuesta de la pregunta actual
                 mutableListOf<RespuestaCuestionario>()
 
-            for (
+            for ( // recorre las 3 opciones de las preguntas
             indiceOpcion in 0 until opciones.length()
             ) {
 
-                val textoOpcion =
+                val textoOpcion = // obtiene el texto de la opcion actual
                     opciones
                         .optString(
                             indiceOpcion,
@@ -770,9 +750,9 @@ private fun procesarJSONCuestionario(
                         )
                         .trim()
 
-                if (textoOpcion.isBlank()) {
+                if (textoOpcion.isBlank()) { // comprueba que no este vacia
 
-                    return ResultadoCuestionarioGenerado(
+                    return ResultadoCuestionarioGenerado( // devuelve error si esta vacia la opcion
                         titulo = null,
                         preguntas = null,
                         mensaje = """
@@ -782,17 +762,17 @@ private fun procesarJSONCuestionario(
                     )
                 }
 
-                respuestas.add(
+                respuestas.add( // agrga la opcion convertida al modelo de study hub
                     RespuestaCuestionario(
                         texto = textoOpcion,
-                        esCorrecta =
+                        esCorrecta = //  marca como correcta la opcion cuyo indice coincida con respuestaCorrecta
                             indiceOpcion ==
                                     respuestaCorrecta
                     )
                 )
             }
 
-            preguntas.add(
+            preguntas.add( // agrega la pregunta completa a la lista de preguntas
                 PreguntaCuestionario(
                     texto = textoPregunta,
                     respuestas = respuestas
@@ -800,7 +780,7 @@ private fun procesarJSONCuestionario(
             )
         }
 
-        ResultadoCuestionarioGenerado(
+        ResultadoCuestionarioGenerado( // devuelve el cuestionario completo despues de valdiar todas las peguntas
             titulo = titulo,
             preguntas = preguntas,
             mensaje = "Cuestionario generado correctamente."
@@ -827,10 +807,13 @@ private fun procesarJSONCuestionario(
     }
 }
 
+
 @Preview(
     showBackground = true,
     backgroundColor = 0xFFFFFFFF,
-    showSystemUi = true
+    showSystemUi = true,
+    widthDp = 412,
+    heightDp = 915
 )
 @Composable
 private fun PreviewCuestionarioRapido() {
@@ -846,6 +829,79 @@ private fun PreviewCuestionarioRapido() {
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
+
+            Box(
+                modifier = Modifier
+                    .size(
+                        width = 390.dp,
+                        height = 380.dp
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(15.dp)
+                    ),
+                contentAlignment = Alignment.TopCenter
+            ) {
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Text(
+                        text = "Cuestionario instantaneo",
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(18.dp)
+                    )
+
+                    CampoContenidoTema(
+                        texto = "",
+                        mostrarError = false,
+                        habilitado = true,
+                        onTextoCambiado = {}
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(10.dp)
+                    )
+
+                    CampoCantidadPreguntas(
+                        texto = "",
+                        mostrarError = false,
+                        habilitado = true,
+                        onTextoCambiado = {}
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(18.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(
+                                width = 107.dp,
+                                height = 36.dp
+                            )
+                            .background(
+                                color = Color(0xFFACC6FF),
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Text(
+                            text = "Generar",
+                            style = TipografiaStudyHub.TituloSeccion,
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }
+

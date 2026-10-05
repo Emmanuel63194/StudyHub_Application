@@ -62,20 +62,20 @@ fun PantallaInicio(
     onEliminarEvento: (CalendarioEntity) -> Unit = {}
 ) {
 
-    val hoyMillis = inicioDelDiaMillis(diasDesdeHoy = 0)
+    val hoyMillis = inicioDelDiaMillis(diasDesdeHoy = 0) // obtieen la fecha de hoy y la de mañana en milisegundos
     val mananaMillis = inicioDelDiaMillis(diasDesdeHoy = 1)
 
-    val eventosHoy = remember(eventos, hoyMillis) {
+    val eventosHoy = remember(eventos, hoyMillis) { // filtra todos los eventos y conserva unicamente los que corresponden a hoy
         eventos.filter { evento -> evento.fecha == hoyMillis }
     }
-    val eventosManana = remember(eventos, mananaMillis) {
+    val eventosManana = remember(eventos, mananaMillis) { // filtra todos los eventos y conserva unicamente los que corresponden a mañana
         eventos.filter { evento -> evento.fecha == mananaMillis }
     }
 
-    var mostrarDetalle by remember { mutableStateOf(false) }
-    var eventoDetalle by remember { mutableStateOf<CalendarioEntity?>(null) }
+    var mostrarDetalle by remember { mutableStateOf(false) } // controla si el detalle de un evento esta visible
+    var eventoDetalle by remember { mutableStateOf<CalendarioEntity?>(null) } // guarda el evento cuyo detalle se esta mostrando
 
-    val abrirDetalle: (CalendarioEntity) -> Unit = { evento ->
+    val abrirDetalle: (CalendarioEntity) -> Unit = { evento -> // guarda el evento seleccioando y muestra su ventana de detale
         eventoDetalle = evento
         mostrarDetalle = true
     }
@@ -132,7 +132,7 @@ fun PantallaInicio(
             )
         }
 
-        AnimatedVisibility(
+        AnimatedVisibility( // Muestra una capa oscura cuando el detalle está abierto.
             visible = mostrarDetalle,
             enter = fadeIn(animationSpec = tween(300)),
             exit = fadeOut(animationSpec = tween(300))
@@ -149,7 +149,7 @@ fun PantallaInicio(
             )
         }
 
-        AnimatedVisibility(
+        AnimatedVisibility( // Muestra el detalle del evento entrando desde la parte inferior.
             visible = mostrarDetalle,
             modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(
@@ -171,11 +171,11 @@ fun PantallaInicio(
     }
 }
 
-private fun inicioDelDiaMillis(diasDesdeHoy: Int): Long {
-    val calendario = Calendar.getInstance().apply {
+private fun inicioDelDiaMillis(diasDesdeHoy: Int): Long { // Obtiene el inicio del día actual o de otro día y lo convierte a milisegundos.
+    val calendario = Calendar.getInstance().apply { // Obtiene la fecha actual del teléfono y le suma la cantidad de días indicada.
         add(Calendar.DAY_OF_MONTH, diasDesdeHoy)
     }
-    return fechaAMillis(
+    return fechaAMillis( // Convierte la fecha obtenida al formato de milisegundos utilizado por los eventos.
         anio = calendario.get(Calendar.YEAR),
         mes = calendario.get(Calendar.MONTH),
         dia = calendario.get(Calendar.DAY_OF_MONTH)
@@ -232,7 +232,7 @@ private fun SeccionEventosDelDia(
 }
 
 @Composable
-private fun FilaEventoResumen(
+private fun FilaEventoResumen( // Crea la fila visual correspondiente a un evento individual.
     evento: CalendarioEntity,
     completado: Boolean,
     onAlternarCompletado: () -> Unit,
@@ -280,7 +280,7 @@ private fun FilaEventoResumen(
                 modifier = Modifier.padding(top = 3.dp)
             )
 
-            if (evento.nota.isNotBlank()) {
+            if (evento.nota.isNotBlank()) { // Comprueba si el evento tiene una nota para decidir si debe mostrarla.
                 Text(
                     text = evento.nota,
                     color = ColorTextoSecundarioEvento,

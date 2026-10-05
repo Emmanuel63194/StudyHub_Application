@@ -65,20 +65,20 @@ internal val ColorTextoSecundarioEvento = Color(0xFF989898)
 internal val ColorRojoEvento = Color(0xFFE5173F)
 private val ColorSuperficieNuevoEvento = Color(0xFF272727)
 
-internal fun fechaAMillis(anio: Int, mes: Int, dia: Int): Long =
+internal fun fechaAMillis(anio: Int, mes: Int, dia: Int): Long = // convierten año, mes dia en una fecha expresdada en milisegundos
     Calendar.getInstance().apply {
         clear()
         set(anio, mes, dia)
     }.timeInMillis
 
-internal fun formatearFechaEvento(fecha: Long): String {
+internal fun formatearFechaEvento(fecha: Long): String { // convierte una fecha en milisegundos al formato mostrado en el evento
     val calendario = Calendar.getInstance().apply { timeInMillis = fecha }
     return "${NombresMeses[calendario.get(Calendar.MONTH)]} " +
             "${calendario.get(Calendar.DAY_OF_MONTH)}, " +
             "${calendario.get(Calendar.YEAR)}"
 }
 
-internal fun formatearHoraEvento(minutosDelDia: Int): String {
+internal fun formatearHoraEvento(minutosDelDia: Int): String { // convierte los minutos del dia al forma de hroa de 12 horas con AM o PM
     val hora24 = minutosDelDia / 60
     val minutos = minutosDelDia % 60
     val hora12 = if (hora24 % 12 == 0) 12 else hora24 % 12
@@ -86,15 +86,15 @@ internal fun formatearHoraEvento(minutosDelDia: Int): String {
     return "$hora12:${minutos.toString().padStart(2, '0')} $sufijo"
 }
 
-internal fun formatearFechaHoraEvento(evento: CalendarioEntity): String =
+internal fun formatearFechaHoraEvento(evento: CalendarioEntity): String = // combina la fecha y hora de un evento para mostrar ambas en un mismo texto
     "${formatearFechaEvento(evento.fecha)} (${formatearHoraEvento(evento.hora)})"
 
-private fun hora12DesdeMinutos(minutosDelDia: Int): Int {
+private fun hora12DesdeMinutos(minutosDelDia: Int): Int { // convierte una hora guardada en minutos a su equivalente de 12 horas
     val hora = (minutosDelDia / 60) % 12
     return if (hora == 0) 12 else hora
 }
 
-private fun minutosDesdeSelector(hora12: Int, minuto: Int, esPm: Boolean): Int =
+private fun minutosDesdeSelector(hora12: Int, minuto: Int, esPm: Boolean): Int = // convierte la hora de 12 horas, los minutos y AM / PM a minutos desde el inicio del dia
     ((hora12 % 12) + if (esPm) 12 else 0) * 60 + minuto
 
 @Composable
@@ -104,46 +104,46 @@ fun NuevoEvento(
     onGuardar: (CalendarioEntity) -> Unit
 ) {
 
-    if (!LocalInspectionMode.current) {
+    if (!LocalInspectionMode.current) { // solicita permiso de notificaciones cuando la aplicacion se ejecuta en una version compatible
         SolicitarPermisoNotificaciones()
     }
 
-    val administradorFoco = LocalFocusManager.current
+    val administradorFoco = LocalFocusManager.current // obtiene el administrador para controlar el teclado y contexto de la aplicacion
     val contexto = LocalContext.current
 
-    var titulo by remember { mutableStateOf(eventoAEditar?.titulo ?: "") }
+    var titulo by remember { mutableStateOf(eventoAEditar?.titulo ?: "") } // guarda el titulo y nota escritos por el usuario
     var nota by remember { mutableStateOf(eventoAEditar?.nota ?: "") }
 
 
-    var fechaMillis by remember { mutableStateOf(eventoAEditar?.fecha) }
+    var fechaMillis by remember { mutableStateOf(eventoAEditar?.fecha) } // guarda la fecha seleccionada en milisegundos
 
-    val horaGuardada = eventoAEditar?.hora
+    val horaGuardada = eventoAEditar?.hora // obtiene la hora guardada cuando se esta editando un evento
 
-    var hora12 by remember {
+    var hora12 by remember { // guarda la hora, minutos, y el formato AM y PM seleccionados
         mutableStateOf(horaGuardada?.let { hora12DesdeMinutos(it) } ?: 1)
     }
     var minuto by remember { mutableStateOf(horaGuardada?.rem(60) ?: 0) }
     var esPm by remember { mutableStateOf(horaGuardada?.let { it / 60 >= 12 } ?: false) }
 
-    var horaEstablecida by remember { mutableStateOf(horaGuardada != null) }
+    var horaEstablecida by remember { mutableStateOf(horaGuardada != null) } // indica si el usario ya establecio una hora
 
-    var mostrarErrores by remember { mutableStateOf(false) }
+    var mostrarErrores by remember { mutableStateOf(false) } // controla si deben mostrarse los mensajes de error del formulario
 
-    val errorTitulo = mostrarErrores && titulo.isBlank()
+    val errorTitulo = mostrarErrores && titulo.isBlank() // determinar que campos obligatorios tienen errores
     val errorFecha = mostrarErrores && fechaMillis == null
     val errorHora = mostrarErrores && !horaEstablecida
 
-    fun cambiarHora(delta: Int) {
+    fun cambiarHora(delta: Int) { // cambia la hora hacia adelante o hacia atras manteniendo el formato de 12 horas
         hora12 = (hora12 - 1 + delta + 12) % 12 + 1
         horaEstablecida = true
     }
 
-    fun cambiarMinuto(delta: Int) {
+    fun cambiarMinuto(delta: Int) { // cambia los minutos hacia adelante hacia atras para mantener el valor entre 0 y 59
         minuto = (minuto + delta + 60) % 60
         horaEstablecida = true
     }
 
-    fun abrirSelectorFecha() {
+    fun abrirSelectorFecha() { // abre el selectorde fecha del sistema y guarda la fecha elegida
         val base = Calendar.getInstance().apply {
             fechaMillis?.let { timeInMillis = it }
         }
@@ -156,12 +156,12 @@ fun NuevoEvento(
         ).show()
     }
 
-    fun alternarAmPm() {
+    fun alternarAmPm() { // cambia entre AM y PM
         esPm = !esPm
         horaEstablecida = true
     }
 
-    fun intentarGuardar() {
+    fun intentarGuardar() { // valida los campos obligatorios y guarda el evento si son correctos
         mostrarErrores = true
 
         if (titulo.isBlank()) titulo = ""
@@ -385,7 +385,7 @@ private fun MensajeErrorEvento(
 }
 
 @Composable
-private fun CampoTextoEvento(
+private fun CampoTextoEvento( // crear un campo de texto reutilizable para el titulo y nota del evento
     valor: String,
     onCambio: (String) -> Unit,
     textoGuia: String,
@@ -434,7 +434,7 @@ private fun SelectorValor(
     onMas: () -> Unit
 ) {
 
-    Row(
+    Row( // crear el contenedor blanco que agrupa el valor y sus botones
         modifier = Modifier
             .size(width = 101.dp, height = 25.dp)
             .clip(RoundedCornerShape(5.dp))
@@ -464,7 +464,7 @@ private fun BotonSelector(
     onClick: () -> Unit
 ) {
 
-    Box(
+    Box( // define el area pulsable del boton y centra el simbolo
         modifier = Modifier
             .width(30.dp)
             .fillMaxHeight()
@@ -493,15 +493,15 @@ private fun SeparadorSelector() {
 @Composable
 private fun SolicitarPermisoNotificaciones() {
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return // no solicita permiso en version de android que no lo requieren
 
     val contexto = LocalContext.current
 
-    val lanzador = rememberLauncherForActivityResult(
+    val lanzador = rememberLauncherForActivityResult( // crea el lazados encargado de mostrar la solicitud de permito del sistema
         ActivityResultContracts.RequestPermission()
     ) { }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) { // comprueba el permiso y lo solicita si todavia no ha sido concedido
         val concedido = ContextCompat.checkSelfPermission(
             contexto, Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED

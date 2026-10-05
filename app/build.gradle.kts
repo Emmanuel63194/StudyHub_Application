@@ -1,4 +1,4 @@
-import java.util.Properties
+import java.util.Properties //  Para poder leer propiedades desde local.properties donde guarda la API key
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,16 +7,16 @@ plugins {
 }
 
 val propiedadesLocales = Properties()
-val archivoPropiedadesLocales = rootProject.file("local.properties")
+val archivoPropiedadesLocales = rootProject.file("local.properties") // creo un objeto para leer esas propiedades y obtener el archivo
 
-if (archivoPropiedadesLocales.exists()) {
+if (archivoPropiedadesLocales.exists()) { // comprueba que local properties exista y carga su contenido
     propiedadesLocales.load(
         archivoPropiedadesLocales.inputStream()
     )
 }
 
 val claveOpenRouter =
-    propiedadesLocales.getProperty("OPENROUTER_API_KEY", "")
+    propiedadesLocales.getProperty("OPENROUTER_API_KEY", "") ///  obtiene especificamente esa API
 
 android {
     namespace = "edu.unicauca.aplimovil.studyhub_application"
@@ -25,7 +25,7 @@ android {
         version = release(37)
     }
 
-    defaultConfig {
+    defaultConfig { // hace que esa clave este dispoinble dentro de la aplicacion mediante buildConfig
         applicationId = "edu.unicauca.aplimovil.studyhub_application"
         minSdk = 24
         targetSdk = 37

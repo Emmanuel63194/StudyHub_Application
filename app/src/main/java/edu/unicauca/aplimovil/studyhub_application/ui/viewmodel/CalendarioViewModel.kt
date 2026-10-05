@@ -29,16 +29,16 @@ class CalendarioViewModel(
             initialValue = emptyList()
         )
 
-    private val _eventosCompletados = MutableStateFlow<Set<Long>>(emptySet())
-    val eventosCompletados: StateFlow<Set<Long>> = _eventosCompletados.asStateFlow()
+    private val _eventosCompletados = MutableStateFlow<Set<Long>>(emptySet()) // guarda los identificadores de los eventos que fueron completados
+    val eventosCompletados: StateFlow<Set<Long>> = _eventosCompletados.asStateFlow() // expone los eventos completados sin permitir modificaciones externas
 
-    fun alternarCompletado(eventoId: Long) {
+    fun alternarCompletado(eventoId: Long) { // marca un evento como completado o lo desmarca si ya estaba completado
         _eventosCompletados.update { completados ->
             if (eventoId in completados) completados - eventoId else completados + eventoId
         }
     }
 
-    fun guardarEvento(evento: CalendarioEntity) {
+    fun guardarEvento(evento: CalendarioEntity) { // guarda un evento ya sea nuevo o actualizado
         viewModelScope.launch {
             val idGuardado = if (evento.id == 0L) {
                 calendarioDao.insertar(evento)
@@ -47,7 +47,7 @@ class CalendarioViewModel(
                 evento.id
             }
 
-            ProgramadorNotificacionesEvento.programar(
+            ProgramadorNotificacionesEvento.programar( // programa la notificacion
                 contexto = getApplication(),
                 evento = evento.copy(id = idGuardado)
             )

@@ -1,6 +1,5 @@
 package edu.unicauca.aplimovil.studyhub_application.ui.screens
 
-import edu.unicauca.aplimovil.studyhub_application.ui.screens.ColorAcento
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,13 +60,13 @@ fun PantallaCuestionarios(
     onCuestionarioClick: (CuestionarioEntity) -> Unit = {}
 ) {
 
-    val cuestionarioViewModel: CuestionarioViewModel = viewModel()
+    val cuestionarioViewModel: CuestionarioViewModel = viewModel() // obtiene el viewmodel encargado para manejar los cuestionarios
 
-    var cuestionarioSeleccionadoParaEliminar by remember {
+    var cuestionarioSeleccionadoParaEliminar by remember { // guarda temporalmente el cuestionario que el usuario quiere eliminar
         mutableStateOf<CuestionarioEntity?>(null)
     }
 
-    var mostrarCuestionarioRapido by remember {
+    var mostrarCuestionarioRapido by remember { // indica si se debe mostrar la ventana de cuestionario rapido
         mutableStateOf(false)
     }
 
@@ -82,14 +81,14 @@ fun PantallaCuestionarios(
                 .statusBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            BarraSuperiorCuestionarios(
+            BarraSuperiorCuestionarios( // aqui es para idnicar se se permite abrir el cuestionario rapido
                 onMenuClick = onMenuClick,
                 onCuestionarioRapidoClick = {
                     mostrarCuestionarioRapido = true
                 }
             )
 
-            if (cuestionarios.isEmpty()) {
+            if (cuestionarios.isEmpty()) { // si no existen cuestionarios
 
                 Column(
                     modifier = Modifier
@@ -109,7 +108,7 @@ fun PantallaCuestionarios(
                         .padding(top = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(
+                    items( // recorro todos los cuestionarios y los muestro uno a uno
                         cuestionarios,
                         key = { it.id }
                     ) { cuestionario ->
@@ -131,7 +130,7 @@ fun PantallaCuestionarios(
             }
         }
 
-        BotonAgregarCuestionario(
+        BotonAgregarCuestionario( // aqui determinamos el boton para agregar
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
@@ -139,7 +138,7 @@ fun PantallaCuestionarios(
             onClick = onAgregarClick
         )
 
-        cuestionarioSeleccionadoParaEliminar?.let { seleccionado ->
+        cuestionarioSeleccionadoParaEliminar?.let { seleccionado -> // aqui comprobamos si hay un cuestionario seleccionado para eliminar
             EliminarRecurso(
                 onCancelar = {
                     cuestionarioSeleccionadoParaEliminar = null
@@ -151,7 +150,7 @@ fun PantallaCuestionarios(
             )
         }
 
-        if (mostrarCuestionarioRapido) {
+        if (mostrarCuestionarioRapido) { // comprueba si se debe mostrar el cuestionario rapido
 
             Box(
                 modifier = Modifier
@@ -255,7 +254,7 @@ private fun TarjetaCuestionario(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(ColorAcento),
+                .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
 
@@ -264,7 +263,7 @@ private fun TarjetaCuestionario(
                     id = R.drawable.cuestionario_icono
                 ),
                 contentDescription = null,
-                tint = ColorFondo,
+                tint = Color.Black,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -358,7 +357,7 @@ private fun BotonAgregarCuestionario(
         modifier = modifier
             .size(56.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(ColorAcento)
+            .background(MaterialTheme.colorScheme.primary)
             .clickable(
                 onClick = onClick
             ),
@@ -388,4 +387,3 @@ fun PantallaCuestionariosPreview() {
         PantallaCuestionarios()
     }
 }
-

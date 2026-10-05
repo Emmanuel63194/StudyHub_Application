@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -32,9 +33,6 @@ import androidx.compose.ui.window.DialogWindowProvider
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 
-private val ColorModal = Color(0xFF191919)
-private val ColorBotonCancelar = Color(0xFF0F0F0F)
-private val ColorBotonEliminar = Color(0xFFACC6FF)
 private val ColorTextoSecundario = Color(0xFF989898)
 
 @Composable
@@ -65,7 +63,7 @@ fun EliminarRecurso(
                 .widthIn(max = 444.dp)
                 .height(191.dp)
                 .clip(RoundedCornerShape(5.dp))
-                .background(ColorModal)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(
                     horizontal = 12.dp,
                     vertical = 16.dp
@@ -104,14 +102,14 @@ fun EliminarRecurso(
 
                 BotonModal(
                     texto = "Cancelar",
-                    colorFondo = ColorBotonCancelar,
+                    colorFondo = MaterialTheme.colorScheme.surfaceContainerLow,
                     colorTexto = Color.White,
                     onClick = onCancelar
                 )
 
                 BotonModal(
                     texto = "Eliminar",
-                    colorFondo = ColorBotonEliminar,
+                    colorFondo = MaterialTheme.colorScheme.primary,
                     colorTexto = Color.Black,
                     style = TipografiaStudyHub.ResaltadoTarjeta,
                     onClick = onEliminar

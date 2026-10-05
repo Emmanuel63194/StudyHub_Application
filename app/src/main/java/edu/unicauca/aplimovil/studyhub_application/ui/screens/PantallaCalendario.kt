@@ -77,9 +77,9 @@ internal val NombresMeses = listOf(
 private const val AnioMinimo = 2000
 private const val AnioMaximo = 2200
 
-private val TamanoIndicadorEvento = 10.dp
+private val TamanoIndicadorEvento = 10.dp // define el tamaño del indicados donde aparece los dias con eventos
 
-private data class FechaSeleccionada(
+private data class FechaSeleccionada( // representa uan fecha seleccionada
     val anio: Int,
     val mes: Int,
     val dia: Int
@@ -93,18 +93,18 @@ fun PantallaCalendario(
     onEliminarEvento: (CalendarioEntity) -> Unit = {}
 ) {
 
-    val hoy = remember {
+    val hoy = remember { // obtiene la fecha actual para utilizarala como punto inicial del calendario
         Calendar.getInstance()
     }
 
-    var indiceMes by remember {
+    var indiceMes by remember { // calcula la posicion del mes actual dentro del rango permitido
         mutableStateOf(
             (hoy.get(Calendar.YEAR) - AnioMinimo) * 12 +
                     hoy.get(Calendar.MONTH)
         )
     }
 
-    var fechaSeleccionada by remember {
+    var fechaSeleccionada by remember { // guarda el dia que actualmente esta selecionado en el calendario
         mutableStateOf(
             FechaSeleccionada(
                 anio = hoy.get(Calendar.YEAR),
@@ -114,16 +114,16 @@ fun PantallaCalendario(
         )
     }
 
-    var mostrarNuevoEvento by remember { mutableStateOf(false) }
-    var eventoEnEdicion by remember { mutableStateOf<CalendarioEntity?>(null) }
+    var mostrarNuevoEvento by remember { mutableStateOf(false) } // controla si se muestra el formulario paracrear o editar un evento
+    var eventoEnEdicion by remember { mutableStateOf<CalendarioEntity?>(null) } // guarda el evento que se esta editando
 
-    var eventoPorEliminar by remember { mutableStateOf<CalendarioEntity?>(null) }
+    var eventoPorEliminar by remember { mutableStateOf<CalendarioEntity?>(null) } // guarda temporalmente el evento que espera confirmacion para ser eliminado
 
-    val diasConEventos = remember(eventos) {
+    val diasConEventos = remember(eventos) { // obtiene las fechas que tiene nal menos un evento para mostrar su indicador
         eventos.map { it.fecha }.toSet()
     }
 
-    val eventosDelDia = remember(eventos, fechaSeleccionada) {
+    val eventosDelDia = remember(eventos, fechaSeleccionada) { // filtra los eventos correspoodiente al dia actualemente seleccionado
         val fechaElegida = fechaAMillis(
             fechaSeleccionada.anio,
             fechaSeleccionada.mes,
@@ -132,7 +132,7 @@ fun PantallaCalendario(
         eventos.filter { evento -> evento.fecha == fechaElegida }
     }
 
-    val anioActual = AnioMinimo + indiceMes / 12
+    val anioActual = AnioMinimo + indiceMes / 12 // obtiene año y mes que corresponden al indice actual
     val mesActual = indiceMes % 12
 
     BackHandler(enabled = mostrarNuevoEvento) {
@@ -165,17 +165,17 @@ fun PantallaCalendario(
                 diasConEventos = diasConEventos,
                 puedeRetroceder = indiceMes > 0,
                 puedeAvanzar = indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1),
-                onMesAnterior = {
+                onMesAnterior = { // cambia al mes anterior cuando todavia esta dentro del rango permitido
                     if (indiceMes > 0) {
                         indiceMes--
                     }
                 },
-                onMesSiguiente = {
+                onMesSiguiente = { // cambia al mes siguiente cuando todavia esta dentro del rango permitido
                     if (indiceMes < ((AnioMaximo - AnioMinimo + 1) * 12 - 1)) {
                         indiceMes++
                     }
                 },
-                onDiaSeleccionado = { dia ->
+                onDiaSeleccionado = { dia -> // actualiar el dia seleccionado del mes mostrado
                     fechaSeleccionada = FechaSeleccionada(
                         anio = anioActual,
                         mes = mesActual,
@@ -224,7 +224,7 @@ fun PantallaCalendario(
             }
         }
 
-        eventoPorEliminar?.let { evento ->
+        eventoPorEliminar?.let { evento -> // mostrar dialogo de confirmacion para eliminar
             EliminarRecurso(
                 titulo = "¿Quieres eliminarlo?",
                 descripcion = "Eliminarás el evento seleccionado.",
@@ -253,7 +253,7 @@ fun PantallaCalendario(
             )
         }
 
-        AnimatedVisibility(
+        AnimatedVisibility( // mostrar el formulario del evento cuando entra desde la parte inferior de la pantalla
             visible = mostrarNuevoEvento,
             modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(
@@ -312,7 +312,7 @@ private fun ContenedorCalendario(
     onDiaSeleccionado: (Int) -> Unit
 ) {
 
-    val semanas = obtenerSemanasDelMes(
+    val semanas = obtenerSemanasDelMes( // obtiene las semanas
         anio = anio,
         mes = mes
     )
@@ -324,7 +324,7 @@ private fun ContenedorCalendario(
             .padding(vertical = 16.dp, horizontal = 12.dp)
     ) {
 
-        NavegacionMes(
+        NavegacionMes( // muestra el nombre del mes, año y botones para cambiar de mes
             anio = anio,
             mes = mes,
             puedeRetroceder = puedeRetroceder,
@@ -339,7 +339,7 @@ private fun ContenedorCalendario(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        semanas.forEach { semana ->
+        semanas.forEach { semana -> // crea una fila visual por cada semana del mes
             FilaDeDias(
                 semana = semana,
                 anio = anio,
@@ -353,7 +353,7 @@ private fun ContenedorCalendario(
 }
 
 @Composable
-private fun NavegacionMes(
+private fun NavegacionMes( // crear la parte superior del calendario donde se puede cambiar de mes
     anio: Int,
     mes: Int,
     puedeRetroceder: Boolean,
@@ -379,7 +379,7 @@ private fun NavegacionMes(
                 )
         )
 
-        Text(
+        Text( // muestra el nombre y el año del mes actual
             text = "${NombresMeses[mes]} $anio",
             color = MaterialTheme.colorScheme.onBackground,
             style = TipografiaStudyHub.TituloSeccion
@@ -398,12 +398,12 @@ private fun NavegacionMes(
 }
 
 @Composable
-private fun EncabezadoDiasSemana() {
+private fun EncabezadoDiasSemana() { // muestra todos los nombres de los dias que aparecen en la parte superior del calendario
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
 
-        DiasSemana.forEach { dia ->
+        DiasSemana.forEach { dia -> // recorre los dias y colocacada uno en una columna de igual tamaño
 
             Text(
                 text = dia,
@@ -417,7 +417,7 @@ private fun EncabezadoDiasSemana() {
 }
 
 @Composable
-private fun FilaDeDias(
+private fun FilaDeDias( // construir una fila del calendario con sus siente posiciones
     semana: List<Int?>,
     anio: Int,
     mes: Int,
@@ -439,9 +439,9 @@ private fun FilaDeDias(
                 contentAlignment = Alignment.Center
             ) {
 
-                if (dia != null) {
+                if (dia != null) { // solo crea una celda cuando existe un dia en esa posicion
 
-                    CeldaDia(
+                    CeldaDia( // muestra el numero del dia y permite seleccionarlo
                         dia = dia,
                         estaSeleccionado =
                             fechaSeleccionada.anio == anio &&
@@ -452,7 +452,7 @@ private fun FilaDeDias(
                         }
                     )
 
-                    if (fechaAMillis(anio, mes, dia) in diasConEventos) {
+                    if (fechaAMillis(anio, mes, dia) in diasConEventos) { // muestra un indicador rojo debajo del dia si tiene evento
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
@@ -506,32 +506,32 @@ private fun obtenerSemanasDelMes(
     mes: Int
 ): List<List<Int?>> {
 
-    val calendario = Calendar.getInstance().apply {
+    val calendario = Calendar.getInstance().apply { // configura un objeto calendar para comenzar desde el primer dia del mes
 
         set(Calendar.YEAR, anio)
         set(Calendar.MONTH, mes)
         set(Calendar.DAY_OF_MONTH, 1)
     }
 
-    val posicionPrimerDia =
+    val posicionPrimerDia = // obtiene la posicion del primer dia tomando el domingo como primera columna
         calendario.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
 
-    val cantidadDias =
+    val cantidadDias =  // Obtiene la cantidad total de días que tiene el mes.
         calendario.getActualMaximum(Calendar.DAY_OF_MONTH)
 
-    val semanas = mutableListOf<List<Int?>>()
+    val semanas = mutableListOf<List<Int?>>() // Crea la lista donde se almacenarán todas las semanas.
 
-    var semanaActual = mutableListOf<Int?>()
+    var semanaActual = mutableListOf<Int?>() // Crea temporalmente la semana que se está construyendo.
 
-    repeat(posicionPrimerDia) {
+    repeat(posicionPrimerDia) { // Agrega espacios vacíos antes del primer día del mes.
         semanaActual.add(null)
     }
 
-    for (dia in 1..cantidadDias) {
+    for (dia in 1..cantidadDias) { // Agrega cada día del mes a la semana correspondiente.
 
         semanaActual.add(dia)
 
-        if (semanaActual.size == 7) {
+        if (semanaActual.size == 7) {  // Cuando la semana tiene siete posiciones, se guarda y comienza otra.
 
             semanas.add(semanaActual)
 
@@ -539,7 +539,7 @@ private fun obtenerSemanasDelMes(
         }
     }
 
-    if (semanaActual.isNotEmpty()) {
+    if (semanaActual.isNotEmpty()) {  // Completa y guarda la última semana si todavía tiene días pendientes.
 
         while (semanaActual.size < 7) {
             semanaActual.add(null)
@@ -552,7 +552,7 @@ private fun obtenerSemanasDelMes(
 }
 
 @Composable
-private fun EstadoVacioEventos() {
+private fun EstadoVacioEventos() { // Muestra el mensaje y la imagen cuando el día seleccionado no tiene eventos.
 
     Column(
         modifier = Modifier
@@ -589,7 +589,7 @@ private fun ListaEventos(
     modifier: Modifier = Modifier
 ) {
 
-    LazyColumn(
+    LazyColumn( // Crea una lista desplazable para mostrar todos los eventos.
         modifier = modifier.fillMaxWidth(),
 
         contentPadding = PaddingValues(bottom = 90.dp)
@@ -600,7 +600,7 @@ private fun ListaEventos(
             LineaDivisoriaEvento()
         }
 
-        items(
+        items( // Recorre los eventos y crea un elemento visual para cada uno.
             items = eventos,
             key = { evento -> evento.id }
         ) { evento ->
@@ -614,7 +614,7 @@ private fun ListaEventos(
 }
 
 @Composable
-private fun ItemEvento(
+private fun ItemEvento( // Muestra la información y las acciones de un evento individual
     evento: CalendarioEntity,
     onEditar: () -> Unit,
     onEliminar: () -> Unit
@@ -663,7 +663,7 @@ private fun ItemEvento(
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        val tieneNota = evento.nota.isNotBlank()
+        val tieneNota = evento.nota.isNotBlank() // Comprueba si el evento tiene una nota para ajustar el espacio inferior del título.
 
         Text(
             text = evento.titulo,
@@ -676,7 +676,7 @@ private fun ItemEvento(
                 .padding(top = 6.dp, bottom = if (tieneNota) 0.dp else 12.dp)
         )
 
-        if (tieneNota) {
+        if (tieneNota) { // Muestra la nota únicamente cuando el evento tiene contenido en ella.
 
             Spacer(modifier = Modifier.height(5.dp))
 

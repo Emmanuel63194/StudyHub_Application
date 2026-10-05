@@ -47,37 +47,33 @@ import edu.unicauca.aplimovil.studyhub_application.ui.theme.AppTheme
 import edu.unicauca.aplimovil.studyhub_application.ui.theme.TipografiaStudyHub
 import edu.unicauca.aplimovil.studyhub_application.ui.viewmodel.CuestionarioViewModel
 
-// Paleta de las pantallas de cuestionarios (también usada por PantallaCuestionarios).
-internal val ColorFondo = Color(0xFF191919)
-internal val ColorSuperficie = Color(0xFF272727)
-internal val ColorAcento = Color(0xFFACC6FF)
 internal val ColorTextoSecundario = Color(0xFF989898)
 private val ColorError = Color(0xFFFF3B47)
 
 @Composable
 fun CrearCuestionario(
-    onVolver: () -> Unit,
-    onCreado: () -> Unit,
+    onVolver: () -> Unit, // para especificarle al usuario que quiere salirse del cuestionario
+    onCreado: () -> Unit, // para confirmar que el cuestionario ya fue guardado correctamente
     cuestionarioAEditar: CuestionarioEntity? = null,
     viewModel: CuestionarioViewModel = viewModel()
 ) {
-    val titulo by viewModel.titulo.collectAsState()
+    val titulo by viewModel.titulo.collectAsState() // aqui recibe el titulo actual de view model
     val preguntas by viewModel.preguntas.collectAsState()
-    val intentoCrear by viewModel.intentoCrear.collectAsState()
+    val intentoCrear by viewModel.intentoCrear.collectAsState() // recibe esta funcion que es importante para los mensajes de error
 
-    LaunchedEffect(cuestionarioAEditar?.id) {
+    LaunchedEffect(cuestionarioAEditar?.id) { // esto es para recibir el cuestionario a editar por el ID
         cuestionarioAEditar?.let {
             viewModel.cargarCuestionarioParaEditar(it)
         }
     }
 
     ContenidoCrearCuestionario(
-        titulo = titulo,
+        titulo = titulo, // le llega el titulo
         preguntas = preguntas,
-        intentoCrear = intentoCrear,
-        alCambiarTitulo = viewModel::actualizarTitulo,
+        intentoCrear = intentoCrear, // le paso la interfaz si el usuario ya intento crear para mostrar mensajes de error
+        alCambiarTitulo = viewModel::actualizarTitulo, // le paso este parametro para detectar si le usuario ya creo algo nuevo
         mensajeErrorPregunta = viewModel::mensajeErrorPregunta,
-        alCambiarPregunta = { indicePregunta, texto ->
+        alCambiarPregunta = { indicePregunta, texto -> // aqui es para modificar una pregunta en especifico
             viewModel.actualizarTextoPregunta(
                 indicePregunta,
                 texto
@@ -108,8 +104,8 @@ fun CrearCuestionario(
         alAgregarPregunta = {
             viewModel.agregarPregunta()
         },
-        onVolver = onVolver,
-        onCrear = {
+        onVolver = onVolver, // le paso la misma funcion para saber cuando el usuario decide salirse del cuestionario
+        onCrear = { // se especifica una condicion cuando cree el cuestionario
             if (cuestionarioAEditar == null) {
                 viewModel.intentarCrear {
                     onCreado()
@@ -123,7 +119,7 @@ fun CrearCuestionario(
                 )
             }
         },
-        modoEdicion = cuestionarioAEditar != null
+        modoEdicion = cuestionarioAEditar != null // esto es un booleano que determina si estoy creando o editando
     )
 }
 
@@ -169,11 +165,10 @@ private fun ContenidoCrearCuestionario(
                 .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // ----- Nombre -----
 
             EncabezadoConError(
                 titulo = "Nombre:",
-                error = if (intentoCrear && titulo.isBlank()) {
+                error = if (intentoCrear && titulo.isBlank()) { // aplico condicional si el usuario intenta crear el cuestionaro y el titulo esta vacio
                     "(Falta el nombre del cuestionario)"
                 } else {
                     null
@@ -183,17 +178,17 @@ private fun ContenidoCrearCuestionario(
             CampoTextoCuestionario(
                 valor = titulo,
                 alCambiar = alCambiarTitulo,
-                placeholder = "Añadir nombre"
+                placeholder = "Añadir nombre" // sirve para mostrar titulo actual, cuando lo modifique y si esta vacio
             )
 
             Spacer(modifier = Modifier.height(2.dp))
 
             preguntas.forEachIndexed { indicePregunta, pregunta ->
 
-                BloquePregunta(
+                BloquePregunta( // se crea el bloque visual de la pregunta
                     indice = indicePregunta,
                     pregunta = pregunta,
-                    error = if (intentoCrear) {
+                    error = if (intentoCrear) { // la condicional de error para cada pregunta
                         mensajeErrorPregunta(pregunta)
                     } else {
                         null
@@ -228,7 +223,7 @@ private fun ContenidoCrearCuestionario(
                     }
                 )
 
-                if (indicePregunta < preguntas.lastIndex) {
+                if (indicePregunta < preguntas.lastIndex) { // aqui determino qun espacio especifico luego de agregar la ultima pregunta
                     Spacer(
                         modifier = Modifier.height(10.dp)
                     )
@@ -241,7 +236,7 @@ private fun ContenidoCrearCuestionario(
                     .align(Alignment.CenterHorizontally)
                     .size(49.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(ColorAcento)
+                    .background(MaterialTheme.colorScheme.primary)
                     .clickable(
                         onClick = alAgregarPregunta
                     ),
@@ -310,7 +305,7 @@ private fun BarraSuperiorCrear(
                 .clip(
                     RoundedCornerShape(20.dp)
                 )
-                .background(ColorAcento)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(
                     onClick = onCrear
                 ),
@@ -327,9 +322,9 @@ private fun BarraSuperiorCrear(
 
 @Composable
 private fun EncabezadoConError(
-    titulo: String,
-    error: String?,
-    contenidoFinal: @Composable RowScope.() -> Unit = {}
+    titulo: String, // que texto deberia mostrar el encabezado
+    error: String?, // le paso el texto del error en string
+    contenidoFinal: @Composable RowScope.() -> Unit = {} // esto es para agregar un icono al final que luego ni se uso
 ) {
     Row(
         modifier = Modifier
@@ -372,7 +367,7 @@ private fun BloquePregunta(
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        EncabezadoConError(
+        EncabezadoConError( // determina a que pregunta se va a mostrar el mensaje de error
             titulo = "Pregunta ${indice + 1}",
             error = error
         ) {
@@ -440,7 +435,7 @@ private fun BloquePregunta(
 }
 
 @Composable
-private fun IconoAccion(
+private fun IconoAccion( //sirve para mostrar un icono que se puede pulsar y ejecutar una accion
     recurso: Int,
     descripcion: String,
     onClick: () -> Unit,
@@ -466,7 +461,7 @@ private fun IconoAccion(
 }
 
 @Composable
-private fun CampoTextoCuestionario(
+private fun CampoTextoCuestionario( // esto es para definir ese campo de texto reutilizable donde el usuario puede escribir, mostrar un texto etc
     valor: String,
     alCambiar: (String) -> Unit,
     placeholder: String,
