@@ -59,14 +59,12 @@ fun PantallaCuestionarios(
     onEliminarClick: (CuestionarioEntity) -> Unit = {},
     onCuestionarioClick: (CuestionarioEntity) -> Unit = {}
 ) {
+    val cuestionarioViewModel: CuestionarioViewModel = viewModel()
 
-    val cuestionarioViewModel: CuestionarioViewModel = viewModel() // obtiene el viewmodel encargado para manejar los cuestionarios
-
-    var cuestionarioSeleccionadoParaEliminar by remember { // guarda temporalmente el cuestionario que el usuario quiere eliminar
+    var cuestionarioSeleccionadoParaEliminar by remember {
         mutableStateOf<CuestionarioEntity?>(null)
     }
-
-    var mostrarCuestionarioRapido by remember { // indica si se debe mostrar la ventana de cuestionario rapido
+    var mostrarCuestionarioRapido by remember {
         mutableStateOf(false)
     }
 
@@ -81,15 +79,14 @@ fun PantallaCuestionarios(
                 .statusBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            BarraSuperiorCuestionarios( // aqui es para idnicar se se permite abrir el cuestionario rapido
+            BarraSuperiorCuestionarios(
                 onMenuClick = onMenuClick,
                 onCuestionarioRapidoClick = {
                     mostrarCuestionarioRapido = true
                 }
             )
 
-            if (cuestionarios.isEmpty()) { // si no existen cuestionarios
-
+            if (cuestionarios.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -99,20 +96,17 @@ fun PantallaCuestionarios(
                 ) {
                     EstadoVacioCuestionarios()
                 }
-
             } else {
-
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
                         .padding(top = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items( // recorro todos los cuestionarios y los muestro uno a uno
+                    items(
                         cuestionarios,
                         key = { it.id }
                     ) { cuestionario ->
-
                         TarjetaCuestionario(
                             cuestionario = cuestionario,
                             onEditarClick = {
@@ -130,7 +124,7 @@ fun PantallaCuestionarios(
             }
         }
 
-        BotonAgregarCuestionario( // aqui determinamos el boton para agregar
+        BotonAgregarCuestionario(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
@@ -138,7 +132,7 @@ fun PantallaCuestionarios(
             onClick = onAgregarClick
         )
 
-        cuestionarioSeleccionadoParaEliminar?.let { seleccionado -> // aqui comprobamos si hay un cuestionario seleccionado para eliminar
+        cuestionarioSeleccionadoParaEliminar?.let { seleccionado ->
             EliminarRecurso(
                 onCancelar = {
                     cuestionarioSeleccionadoParaEliminar = null
@@ -150,8 +144,7 @@ fun PantallaCuestionarios(
             )
         }
 
-        if (mostrarCuestionarioRapido) { // comprueba si se debe mostrar el cuestionario rapido
-
+        if (mostrarCuestionarioRapido) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -162,14 +155,11 @@ fun PantallaCuestionarios(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-
                 CuestionarioRapido(
                     viewModel = cuestionarioViewModel,
-
                     onCerrar = {
                         mostrarCuestionarioRapido = false
                     },
-
                     onCuestionarioGuardado = {
                         mostrarCuestionarioRapido = false
                     }
@@ -188,7 +178,6 @@ private fun BarraSuperiorCuestionarios(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         IconoHamburguesa(
             modifier = Modifier
                 .size(
@@ -249,7 +238,6 @@ private fun TarjetaCuestionario(
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -257,7 +245,6 @@ private fun TarjetaCuestionario(
                 .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
-
             Icon(
                 painter = painterResource(
                     id = R.drawable.cuestionario_icono
@@ -313,7 +300,6 @@ private fun TarjetaCuestionario(
 
 @Composable
 private fun EstadoVacioCuestionarios() {
-
     Image(
         painter = painterResource(
             id = R.drawable.cuestionario_vacio
@@ -363,7 +349,6 @@ private fun BotonAgregarCuestionario(
             ),
         contentAlignment = Alignment.Center
     ) {
-
         Text(
             text = "+",
             color = Color.Black,
@@ -379,7 +364,6 @@ private fun BotonAgregarCuestionario(
 )
 @Composable
 fun PantallaCuestionariosPreview() {
-
     AppTheme(
         darkTheme = true,
         dynamicColor = false

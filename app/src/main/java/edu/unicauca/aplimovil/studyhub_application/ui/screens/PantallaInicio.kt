@@ -62,20 +62,20 @@ fun PantallaInicio(
     onEliminarEvento: (CalendarioEntity) -> Unit = {}
 ) {
 
-    val hoyMillis = inicioDelDiaMillis(diasDesdeHoy = 0) // obtieen la fecha de hoy y la de mañana en milisegundos
+    val hoyMillis = inicioDelDiaMillis(diasDesdeHoy = 0)
     val mananaMillis = inicioDelDiaMillis(diasDesdeHoy = 1)
 
-    val eventosHoy = remember(eventos, hoyMillis) { // filtra todos los eventos y conserva unicamente los que corresponden a hoy
+    val eventosHoy = remember(eventos, hoyMillis) {
         eventos.filter { evento -> evento.fecha == hoyMillis }
     }
-    val eventosManana = remember(eventos, mananaMillis) { // filtra todos los eventos y conserva unicamente los que corresponden a mañana
+    val eventosManana = remember(eventos, mananaMillis) {
         eventos.filter { evento -> evento.fecha == mananaMillis }
     }
 
-    var mostrarDetalle by remember { mutableStateOf(false) } // controla si el detalle de un evento esta visible
-    var eventoDetalle by remember { mutableStateOf<CalendarioEntity?>(null) } // guarda el evento cuyo detalle se esta mostrando
+    var mostrarDetalle by remember { mutableStateOf(false) }
+    var eventoDetalle by remember { mutableStateOf<CalendarioEntity?>(null) }
 
-    val abrirDetalle: (CalendarioEntity) -> Unit = { evento -> // guarda el evento seleccioando y muestra su ventana de detale
+    val abrirDetalle: (CalendarioEntity) -> Unit = { evento ->
         eventoDetalle = evento
         mostrarDetalle = true
     }
@@ -85,7 +85,6 @@ fun PantallaInicio(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,7 +93,6 @@ fun PantallaInicio(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconoHamburguesa(
                     modifier = Modifier
@@ -108,7 +106,6 @@ fun PantallaInicio(
                     style = TipografiaStudyHub.TituloSeccion
                 )
             }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             SeccionEventosDelDia(
@@ -132,7 +129,7 @@ fun PantallaInicio(
             )
         }
 
-        AnimatedVisibility( // Muestra una capa oscura cuando el detalle está abierto.
+        AnimatedVisibility(
             visible = mostrarDetalle,
             enter = fadeIn(animationSpec = tween(300)),
             exit = fadeOut(animationSpec = tween(300))
@@ -149,7 +146,7 @@ fun PantallaInicio(
             )
         }
 
-        AnimatedVisibility( // Muestra el detalle del evento entrando desde la parte inferior.
+        AnimatedVisibility(
             visible = mostrarDetalle,
             modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(
@@ -171,11 +168,11 @@ fun PantallaInicio(
     }
 }
 
-private fun inicioDelDiaMillis(diasDesdeHoy: Int): Long { // Obtiene el inicio del día actual o de otro día y lo convierte a milisegundos.
-    val calendario = Calendar.getInstance().apply { // Obtiene la fecha actual del teléfono y le suma la cantidad de días indicada.
+private fun inicioDelDiaMillis(diasDesdeHoy: Int): Long {
+    val calendario = Calendar.getInstance().apply {
         add(Calendar.DAY_OF_MONTH, diasDesdeHoy)
     }
-    return fechaAMillis( // Convierte la fecha obtenida al formato de milisegundos utilizado por los eventos.
+    return fechaAMillis(
         anio = calendario.get(Calendar.YEAR),
         mes = calendario.get(Calendar.MONTH),
         dia = calendario.get(Calendar.DAY_OF_MONTH)
@@ -208,11 +205,8 @@ private fun SeccionEventosDelDia(
 
         TarjetaResumen(
             contenidoEventos = {
-
                 eventos.forEachIndexed { indice, evento ->
-
                     key(evento.id) {
-
                         if (indice > 0) {
                             Spacer(modifier = Modifier.height(16.dp))
                         }
@@ -232,7 +226,7 @@ private fun SeccionEventosDelDia(
 }
 
 @Composable
-private fun FilaEventoResumen( // Crea la fila visual correspondiente a un evento individual.
+private fun FilaEventoResumen(
     evento: CalendarioEntity,
     completado: Boolean,
     onAlternarCompletado: () -> Unit,
@@ -244,7 +238,6 @@ private fun FilaEventoResumen( // Crea la fila visual correspondiente a un event
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
-
         Box(
             modifier = Modifier
                 .size(30.dp)
@@ -269,7 +262,6 @@ private fun FilaEventoResumen( // Crea la fila visual correspondiente a un event
                 .weight(1f)
                 .clickable(onClick = onAbrirDetalle)
         ) {
-
             Text(
                 text = evento.titulo,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -280,7 +272,7 @@ private fun FilaEventoResumen( // Crea la fila visual correspondiente a un event
                 modifier = Modifier.padding(top = 3.dp)
             )
 
-            if (evento.nota.isNotBlank()) { // Comprueba si el evento tiene una nota para decidir si debe mostrarla.
+            if (evento.nota.isNotBlank()) {
                 Text(
                     text = evento.nota,
                     color = ColorTextoSecundarioEvento,
@@ -293,7 +285,6 @@ private fun FilaEventoResumen( // Crea la fila visual correspondiente a un event
         }
 
         if (completado) {
-
             Spacer(modifier = Modifier.width(8.dp))
 
             Image(

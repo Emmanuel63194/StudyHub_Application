@@ -65,20 +65,22 @@ internal val ColorTextoSecundarioEvento = Color(0xFF989898)
 internal val ColorRojoEvento = Color(0xFFE5173F)
 private val ColorSuperficieNuevoEvento = Color(0xFF272727)
 
-internal fun fechaAMillis(anio: Int, mes: Int, dia: Int): Long = // convierten año, mes dia en una fecha expresdada en milisegundos
+internal fun fechaAMillis(anio: Int, mes: Int, dia: Int): Long =
     Calendar.getInstance().apply {
         clear()
         set(anio, mes, dia)
     }.timeInMillis
 
-internal fun formatearFechaEvento(fecha: Long): String { // convierte una fecha en milisegundos al formato mostrado en el evento
-    val calendario = Calendar.getInstance().apply { timeInMillis = fecha }
+internal fun formatearFechaEvento(fecha: Long): String {
+    val calendario = Calendar.getInstance().apply {
+        timeInMillis = fecha
+    }
     return "${NombresMeses[calendario.get(Calendar.MONTH)]} " +
             "${calendario.get(Calendar.DAY_OF_MONTH)}, " +
             "${calendario.get(Calendar.YEAR)}"
 }
 
-internal fun formatearHoraEvento(minutosDelDia: Int): String { // convierte los minutos del dia al forma de hroa de 12 horas con AM o PM
+internal fun formatearHoraEvento(minutosDelDia: Int): String {
     val hora24 = minutosDelDia / 60
     val minutos = minutosDelDia % 60
     val hora12 = if (hora24 % 12 == 0) 12 else hora24 % 12
@@ -86,15 +88,15 @@ internal fun formatearHoraEvento(minutosDelDia: Int): String { // convierte los 
     return "$hora12:${minutos.toString().padStart(2, '0')} $sufijo"
 }
 
-internal fun formatearFechaHoraEvento(evento: CalendarioEntity): String = // combina la fecha y hora de un evento para mostrar ambas en un mismo texto
+internal fun formatearFechaHoraEvento(evento: CalendarioEntity): String =
     "${formatearFechaEvento(evento.fecha)} (${formatearHoraEvento(evento.hora)})"
 
-private fun hora12DesdeMinutos(minutosDelDia: Int): Int { // convierte una hora guardada en minutos a su equivalente de 12 horas
+private fun hora12DesdeMinutos(minutosDelDia: Int): Int {
     val hora = (minutosDelDia / 60) % 12
     return if (hora == 0) 12 else hora
 }
 
-private fun minutosDesdeSelector(hora12: Int, minuto: Int, esPm: Boolean): Int = // convierte la hora de 12 horas, los minutos y AM / PM a minutos desde el inicio del dia
+private fun minutosDesdeSelector(hora12: Int, minuto: Int, esPm: Boolean): Int =
     ((hora12 % 12) + if (esPm) 12 else 0) * 60 + minuto
 
 @Composable
@@ -103,65 +105,88 @@ fun NuevoEvento(
     onCerrar: () -> Unit,
     onGuardar: (CalendarioEntity) -> Unit
 ) {
-
-    if (!LocalInspectionMode.current) { // solicita permiso de notificaciones cuando la aplicacion se ejecuta en una version compatible
+    if (!LocalInspectionMode.current) {
         SolicitarPermisoNotificaciones()
     }
 
-    val administradorFoco = LocalFocusManager.current // obtiene el administrador para controlar el teclado y contexto de la aplicacion
+    val administradorFoco = LocalFocusManager.current
     val contexto = LocalContext.current
 
-    var titulo by remember { mutableStateOf(eventoAEditar?.titulo ?: "") } // guarda el titulo y nota escritos por el usuario
-    var nota by remember { mutableStateOf(eventoAEditar?.nota ?: "") }
-
-
-    var fechaMillis by remember { mutableStateOf(eventoAEditar?.fecha) } // guarda la fecha seleccionada en milisegundos
-
-    val horaGuardada = eventoAEditar?.hora // obtiene la hora guardada cuando se esta editando un evento
-
-    var hora12 by remember { // guarda la hora, minutos, y el formato AM y PM seleccionados
-        mutableStateOf(horaGuardada?.let { hora12DesdeMinutos(it) } ?: 1)
+    var titulo by remember {
+        mutableStateOf(eventoAEditar?.titulo ?: "")
     }
-    var minuto by remember { mutableStateOf(horaGuardada?.rem(60) ?: 0) }
-    var esPm by remember { mutableStateOf(horaGuardada?.let { it / 60 >= 12 } ?: false) }
+    var nota by remember {
+        mutableStateOf(eventoAEditar?.nota ?: "")
+    }
 
-    var horaEstablecida by remember { mutableStateOf(horaGuardada != null) } // indica si el usario ya establecio una hora
+    var fechaMillis by remember {
+        mutableStateOf(eventoAEditar?.fecha)
+    }
 
-    var mostrarErrores by remember { mutableStateOf(false) } // controla si deben mostrarse los mensajes de error del formulario
+    val horaGuardada = eventoAEditar?.hora
 
-    val errorTitulo = mostrarErrores && titulo.isBlank() // determinar que campos obligatorios tienen errores
+    var hora12 by remember {
+        mutableStateOf(
+            horaGuardada?.let {
+                hora12DesdeMinutos(it)
+            } ?: 1
+        )
+    }
+
+    var minuto by remember {
+        mutableStateOf(horaGuardada?.rem(60) ?: 0)
+    }
+
+    var esPm by remember {
+        mutableStateOf(horaGuardada?.let { it / 60 >= 12 } ?: false)
+    }
+
+    var horaEstablecida by remember {
+        mutableStateOf(horaGuardada != null)
+    }
+
+    var mostrarErrores by remember {
+        mutableStateOf(false)
+    }
+
+    val errorTitulo = mostrarErrores && titulo.isBlank()
     val errorFecha = mostrarErrores && fechaMillis == null
     val errorHora = mostrarErrores && !horaEstablecida
 
-    fun cambiarHora(delta: Int) { // cambia la hora hacia adelante o hacia atras manteniendo el formato de 12 horas
+    fun cambiarHora(delta: Int) {
         hora12 = (hora12 - 1 + delta + 12) % 12 + 1
         horaEstablecida = true
     }
 
-    fun cambiarMinuto(delta: Int) { // cambia los minutos hacia adelante hacia atras para mantener el valor entre 0 y 59
+    fun cambiarMinuto(delta: Int) {
         minuto = (minuto + delta + 60) % 60
         horaEstablecida = true
     }
 
-    fun abrirSelectorFecha() { // abre el selectorde fecha del sistema y guarda la fecha elegida
+    fun abrirSelectorFecha() {
         val base = Calendar.getInstance().apply {
-            fechaMillis?.let { timeInMillis = it }
+            fechaMillis?.let {
+                timeInMillis = it
+            }
         }
+
         DatePickerDialog(
             contexto,
-            { _, anio, mes, dia -> fechaMillis = fechaAMillis(anio, mes, dia) },
+            { _, anio, mes, dia ->
+                fechaMillis = fechaAMillis(anio, mes, dia)
+            },
             base.get(Calendar.YEAR),
             base.get(Calendar.MONTH),
             base.get(Calendar.DAY_OF_MONTH)
         ).show()
     }
 
-    fun alternarAmPm() { // cambia entre AM y PM
+    fun alternarAmPm() {
         esPm = !esPm
         horaEstablecida = true
     }
 
-    fun intentarGuardar() { // valida los campos obligatorios y guarda el evento si son correctos
+    fun intentarGuardar() {
         mostrarErrores = true
 
         if (titulo.isBlank()) titulo = ""
@@ -189,9 +214,10 @@ fun NuevoEvento(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            // Consume los toques para que no lleguen al fondo oscuro.
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
                 indication = null,
                 onClick = {}
             )
@@ -200,13 +226,11 @@ fun NuevoEvento(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.cerrar_icono),
                 contentDescription = "Cerrar",
@@ -220,7 +244,9 @@ fun NuevoEvento(
                     .size(width = 107.dp, height = 36.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable { intentarGuardar() },
+                    .clickable {
+                        intentarGuardar()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -248,11 +274,12 @@ fun NuevoEvento(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { abrirSelectorFecha() }
+                .clickable {
+                    abrirSelectorFecha()
+                }
                 .padding(horizontal = 4.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.calendario_icono),
                 contentDescription = null,
@@ -262,8 +289,9 @@ fun NuevoEvento(
             Spacer(modifier = Modifier.width(12.dp))
 
             Text(
-                text = fechaMillis?.let { formatearFechaEvento(it) }
-                    ?: "Establecer dia del evento",
+                text = fechaMillis?.let {
+                    formatearFechaEvento(it)
+                } ?: "Establecer dia del evento",
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 modifier = Modifier.weight(1f)
@@ -292,7 +320,6 @@ fun NuevoEvento(
                 .padding(start = 4.dp, top = 14.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.reloj_icono),
                 contentDescription = null,
@@ -318,10 +345,12 @@ fun NuevoEvento(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(
+                6.dp,
+                Alignment.CenterHorizontally
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             SelectorValor(
                 texto = hora12.toString().padStart(2, '0'),
                 onMenos = { cambiarHora(-1) },
@@ -349,7 +378,6 @@ fun NuevoEvento(
 
         LineaDivisoriaEvento()
 
-        /* ---- Nota ---- */
         CampoTextoEvento(
             valor = nota,
             onCambio = { nota = it },
@@ -385,7 +413,7 @@ private fun MensajeErrorEvento(
 }
 
 @Composable
-private fun CampoTextoEvento( // crear un campo de texto reutilizable para el titulo y nota del evento
+private fun CampoTextoEvento(
     valor: String,
     onCambio: (String) -> Unit,
     textoGuia: String,
@@ -393,7 +421,6 @@ private fun CampoTextoEvento( // crear un campo de texto reutilizable para el ti
     modifier: Modifier = Modifier,
     mensajeError: String? = null
 ) {
-
     BasicTextField(
         value = valor,
         onValueChange = onCambio,
@@ -410,7 +437,6 @@ private fun CampoTextoEvento( // crear un campo de texto reutilizable para el ti
         decorationBox = { campo ->
             Box {
                 if (valor.isEmpty()) {
-
                     Text(
                         text = mensajeError ?: textoGuia,
                         color = if (mensajeError != null) {
@@ -433,15 +459,13 @@ private fun SelectorValor(
     onMenos: () -> Unit,
     onMas: () -> Unit
 ) {
-
-    Row( // crear el contenedor blanco que agrupa el valor y sus botones
+    Row(
         modifier = Modifier
             .size(width = 101.dp, height = 25.dp)
             .clip(RoundedCornerShape(5.dp))
             .background(Color.White),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         BotonSelector(simbolo = "−", onClick = onMenos)
 
         Text(
@@ -463,8 +487,7 @@ private fun BotonSelector(
     simbolo: String,
     onClick: () -> Unit
 ) {
-
-    Box( // define el area pulsable del boton y centra el simbolo
+    Box(
         modifier = Modifier
             .width(30.dp)
             .fillMaxHeight()
@@ -492,18 +515,18 @@ private fun SeparadorSelector() {
 
 @Composable
 private fun SolicitarPermisoNotificaciones() {
-
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return // no solicita permiso en version de android que no lo requieren
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
 
     val contexto = LocalContext.current
 
-    val lanzador = rememberLauncherForActivityResult( // crea el lazados encargado de mostrar la solicitud de permito del sistema
+    val lanzador = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { }
 
-    LaunchedEffect(Unit) { // comprueba el permiso y lo solicita si todavia no ha sido concedido
+    LaunchedEffect(Unit) {
         val concedido = ContextCompat.checkSelfPermission(
-            contexto, Manifest.permission.POST_NOTIFICATIONS
+            contexto,
+            Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
 
         if (!concedido) {
@@ -520,7 +543,6 @@ private fun SolicitarPermisoNotificaciones() {
 )
 @Composable
 fun NuevoEventoPreview() {
-
     AppTheme(
         darkTheme = true,
         dynamicColor = false
